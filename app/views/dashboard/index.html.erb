@@ -1,0 +1,115 @@
+<style>
+  
+  #total {
+    font-weight: 600;
+    color: #830001;
+  }
+  .tools {
+    text-align: center;
+  }
+  .row-fluid {
+    margin: 20px 0;
+  }
+
+  p.info {
+    margin: 0;
+    color: #989898;
+    font-size: 14px;
+    line-height: 2;
+  }
+
+  .icon-tool {
+    display: block;
+    background-repeat: no-repeat;
+    background-image: url(/images/sprite.png);
+    width: 300px;
+    height: 100px;
+    margin-bottom: 10px;
+  }
+  .icon-tool.search {
+    background-position: 0 0;
+  }
+  .icon-tool.follow {
+    background-position: 0 -100px;
+  }
+  .icon-tool.inter {
+    background-position: 0 -200px;
+  }
+  .icon-tool.lbs {
+    background-position: 0 -300px;
+  }
+  .icon-tool.foward {
+    background-position: 0 -400px;
+  }
+  .icon-tool.push {
+    background-position: 0 -500px;
+  }
+</style>
+<div class="hero-unit clearfix">
+  <div style="float:right; margin-left:20px;">
+    <img src="/images/logo.jpg" alt="logo" width="250" height="151" style="border-radius: 50px;"></img>
+  </div>
+  <div style="overflow:hidden;zoom:1;">
+    <h1>微博营销数据平台</h1>
+    <p id="total-line">本平台目前包含
+      <!--<span id="total">
+        <img src='/images/ajax_load.gif' style="width: 28px;"/>
+      </span>-->
+      超过1亿个微博用户的详细信息
+    </p>
+    <p class="info">通过自主研发的SNS爬虫技术，获取新浪微博、腾讯微博等SNS社区中的用户详细信息，并以此为基础构建海量数据平台。</p>
+     <p class="info">基于平台中的海量用户数据进行多维度的用户数据分析，提供图表、报告等形式的数据分析服务，为业务分析提供参考。</p>
+    <!-- <p><a class="btn btn-primary btn-large">了解更多 »</a></p> -->
+  </div>
+</div>
+<div class="tools">
+    <div class="row-fluid">
+        <div class="span4">
+          <a class="icon-tool search" href="/search" title="微博搜人"></a>
+          <p>通过设定标签、年龄、性别、公司等条件搜索微博用户并对目标人群进行数据分析和数据导出。</p>
+        </div>
+         <div class="span4">
+          <a class="icon-tool follow" href="/follow" title="关注工具"></a>
+          <p>提供批量关注和批量取消关注服务，便于进行关注和取消关注，使关注人群效果最大化。</p>
+        </div>
+         <div class="span4">
+          <a class="icon-tool inter" href="/interactive" title="实时互动"></a>
+          <p>获取关注人群、粉丝人群或自定义人群最新一条微博，并可方便完成转发和评论，从而增强于特定用户的实时互动。</p>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span4">
+          <a class="icon-tool lbs" href="/lbs" title="LBS工具"></a>
+          <p>获取某地点附近的人和微博，并提供数据分析和导出服务，便于进行基于地理位置的营销。</p>
+        </div>
+         <div class="span4">
+          <a class="icon-tool foward" href="/repost/setting" title="定时转发"></a>
+          <p>通过设定微博账号和时间间隔，系统将定时自动转发指定账号的最新微博，以创造最大化的传播效果。</p>
+        </div>
+         <div class="span4">
+          <a class="icon-tool push" href="/push" title="精准推送"></a>
+          <p>通过设定推送内容，完成向目标用户群的精准内容推送，以帮助微博营销。</p>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span4">
+          <a class="icon-tool lbs" href="/competitor" title="LBS工具"></a>
+          <p>竞品分析</p>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+  function load_all_user_count(){
+    url = "/get_count_of_all_users.json";
+    $.get(url,
+      {},
+      function(result){
+        $("#total").text(result.all_user_count);
+      } , 'json');
+  }
+  
+  $(document).ready(function(){
+    //load_all_user_count();
+  });  
+</script>

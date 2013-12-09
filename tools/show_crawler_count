@@ -1,0 +1,14 @@
+#/usr/bin/bash
+echo 'count of died indexer: '`not_run_indexer_screen.sh| wc -l`
+
+echo 'count of total search crawler: '`screen -ls search |grep search -c`', down count: '`not_run_search_screen.sh| wc -l`
+
+echo 'count of total mobile crawler:'`screen -ls mobile |grep mobile -c`', down count: '`not_run_mobile_screen.sh| wc -l`
+
+echo 'count of total contact crawler:'`screen -ls contact |grep contact -c`', down count: '`not_run_contact_screen.sh| wc -l`
+
+echo 'count of total update crawler:'`screen -ls update |grep update -c`', down count: '`not_run_update_screen.sh| wc -l`
+
+echo 'count of total zero contact crawler:'`screen -ls zero |grep zero -c`', down count: '`not_run_zero_screen.sh| wc -l`
+
+echo 'count of total empty mobile crawler:'`screen -ls empty |grep empty -c`', down count: '`not_run_empty_screen.sh| wc -l`

@@ -1,0 +1,25 @@
+<style type="text/css">
+  .form-signin {
+          max-width: 300px;
+          padding: 19px 29px 29px;
+          margin: 0 auto 20px;
+          background-color: #fff;
+          border: 1px solid #e5e5e5;
+          -webkit-border-radius: 5px;
+             -moz-border-radius: 5px;
+                  border-radius: 5px;
+          -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+             -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+                  box-shadow: 0 1px 2px rgba(0,0,0,.05);
+        }
+</style>
+ <% if flash[:notice] %>
+   <div id="notice" style="padding-left:30px;padding-top:5px;"><%= flash[:notice] %></div>
+  <% end %>
+<form class="form-signin" action="/admin/login" method="post">
+        <h2 class="form-signin-heading">登录</h2>
+        <input type="text" name="name" class="input-block-level" placeholder="用户名">
+        <input type="password" name="password" class="input-block-level" placeholder="密码">
+        <button class="btn btn-large btn-primary" type="submit">登录</button>
+</form>
+

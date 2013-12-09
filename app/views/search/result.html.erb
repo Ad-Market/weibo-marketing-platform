@@ -1,0 +1,523 @@
+<style type="text/css">
+  #user_list {
+    border-top: 1px solid #d7d7d7;
+  }
+
+  #user_list .actions {
+    float: right;
+    margin: 20px 0;
+  }
+
+  #user_list .actions i {
+    vertical-align: baseline;
+    margin-right: 2px;
+  }
+
+  
+  #result-list >div {
+    width: auto;
+  }
+
+  #result-list .control-group {
+    margin-bottom: 6px;
+  }
+
+  #result-list .control-label {
+    float: left;
+    width: 100px;
+    padding-top: 0;
+    text-align: left;
+  }
+
+  #result-list .controls {
+    margin-left: 120px;
+  }
+ 
+  #serarch-box {
+    overflow: hidden;
+  }
+
+  #serarch-box img {
+    float: left;
+  }
+  #serarch-box form {
+    float: left;
+  }
+
+  #serarch-box form input{
+    width: 350px;
+    height: 32px;
+    line-height: 32px;
+    margin-right:  40px;
+  }
+
+  .avatar img {
+    width: 100%;
+  }
+
+  .page {
+    text-align: center;
+    margin-top: 30px;
+  }
+
+  .page  a, .page  em { 
+    padding: 0 5px;
+  }
+
+  .user_atten {
+    margin: 10px 0;
+  }
+  .user_atten li {
+    list-style: none;
+    padding: 0 3px 3px;
+    float: left;
+    border-right-width: 1px;
+    border-right-style: solid;
+    border-color: #D9D9D9;
+    text-align: center;
+    width: 30%;
+  }
+  .user_atten li.W_no_border {
+    border: 0;
+  }
+  .user_atten li strong {
+    line-height: 2;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+
+</style>
+
+<%= javascript_include_tag  "search.js" %>
+
+<script type="text/javascript">
+ $(document).ready(
+  function () {
+    $('#export').bind('click', function() { 
+        var r_export;
+        show_export_dialog(function() {
+          r_export = new result_export();
+          r_export.init();
+        }, function() {
+          r_export.clearTimer();
+          r_export = null;
+        });
+        
+        ajax_generate_csv();
+     });
+  }
+ );
+</script>
+
+<div id="container">
+<div id="serarch-box">
+   <img  src="/images/darui_small_logo.png">
+   <form method="get" action="/search/result" class="form-search">
+     <input type="text"  id="search_input" class="input-medium search-query" maxlength="100" name="key">
+     <button class="btn btn-primary" type="submit">搜  索</button>
+     <span style="margin-left:10px;"><a onclick="show_dialog();" href="#">高级搜索</a></span>
+   </form>
+ </div>
+  <div id="user_list">
+    <div class="actions">
+      <% if session[:logged] %>
+        <a href="statistics?<%= request.query_string %>" id="statistics"><i class="icon-list"></i>统计图表</a>
+        <a href="#" id="export" style="margin-left:10px;"><i class="icon-download-alt"></i>导出</a>
+      <% end %>
+    </div>
+    <div style="clear:both;"></div>
+        <div id="result-list">
+            <% @users.each do |user| %>
+            <div class="well row-fluid">
+             <div class="span3">
+                  <div class="avatar"><img src='http://tp4.sinaimg.cn/<%= user.uid %>/180/0' /></div>
+                  <ul class="user_atten clearfix">
+                    <li class="S_line1"><strong node-type="follow"><%= user.followers_count %></strong><span>关注 </span></a></li>
+                    <li class="S_line1"><strong node-type="fans"><%= user.fans_count %></strong><span>粉丝</span></a></li>
+                    <li class="W_no_border"><strong node-type="weibo"><%= user.weibo_count %></strong><span>微博</span></a></li>
+                   </ul>
+                </div>
+              <div class="span9 form-horizontal">
+                    <div class="control-group">
+                      <label class="control-label">昵称：</label>
+                      <div class="controls">
+                        <a href="http://weibo.com/<%=user.uid %>/info" target="__blank">
+                                            <%= user.screen_name %>(ID:<%= user.uid %>)</a>
+                                            <% if user.v == "vip" %><img src="/images/transparent.gif" class="vip"></img><% end %>
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label class="control-label">区域：</label>
+                      <div class="controls">
+                        <%= $province_hash[user.province] %>&nbsp<%= $city_hash[user.province.to_s+" "+user.city.to_s] %>
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label class="control-label">性别：</label>
+                      <div class="controls">
+                        <%= $gender_hash[user.gender] %>
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label class="control-label">用户类型：</label>
+                      <div class="controls">
+                        <%= $v_hash[user.v] %>
+                      </div>
+                    </div>
+                    <div class="control-group">
+                      <label class="control-label">年龄范围：</label>
+                      <div class="controls">
+                        <%= $age_hash[user.age] %>
+                      </div>
+                    </div>
+                    <% if !user.email.nil? && !user.email.empty? %>
+                      <div class="control-group">
+                        <label class="control-label">邮箱：</label>
+                        <div class="controls">
+                          <%= user.email %>
+                        </div>
+                      </div>
+                    <% end %>
+                    <% if !user.qq.nil? && !user.qq.empty? %>
+                    <div class="control-group">
+                      <label class="control-label">QQ：</label>
+                      <div class="controls">
+                        <%= user.qq %>
+                      </div>
+                    </div>
+                    <% end %>
+                    <% if !user.msn.nil? && !user.msn.empty? %>
+                    <div class="control-group">
+                      <label class="control-label">MSN：</label>
+                      <div class="controls">
+                        <%= user.msn %>
+                      </div>
+                    </div>
+                    <% end %>
+                    <% if !user.description.nil? && !user.description.empty? %>
+                    <div class="control-group">
+                      <label class="control-label">简介：</label>
+                      <div class="controls">
+                        <%= user.description %>
+                      </div>
+                    </div>
+                    <% end %>
+                    <% if !user.tags.nil? && !user.tags.empty? %>
+                    <div class="control-group">
+                      <label class="control-label">标签：</label>
+                      <div class="controls">
+                        <%= user.tags %>
+                      </div>
+                    </div>
+                    <% end %>
+                    <% if !user.certification.nil? && !user.certification.empty? %>
+                    <div class="control-group">
+                      <label class="control-label">认证信息：</label>
+                      <div class="controls">
+                        <%= user.certification %>
+                      </div>
+                    </div>
+                    <% end %>
+                    <% if !user.daren.nil? && !user.daren.empty? %>
+                    <div class="control-group">
+                      <label class="control-label">兴趣：</label>
+                      <div class="controls">
+                        <%= user.daren %>
+                      </div>
+                    </div>
+                    <% end %>
+                    <% if !user.job.nil? && !user.job.empty? && !user.job.lstrip.empty? %>
+                    <div class="control-group">
+                      <label class="control-label">工作经历：</label>
+                      <div class="controls">
+                        <% split_by_dollar(user.job).each do |one_job| %>
+                        <%= one_job %> <br>
+                        <% end %>
+                      </div>
+                    </div>
+                    <% end %>
+                    <% if !user.school.nil? && !user.school.empty? && !user.school.lstrip.empty?%>
+                    <div class="control-group">
+                      <label class="control-label">教育经历：</label>
+                      <div class="controls">
+                        <% split_by_dollar(user.school).each do |one_school| %>
+                        <%= one_school %> <br>
+                        <% end %>
+                      </div>
+                    </div>
+                    <% end %>
+              </div>
+            <!--% end %-->
+          </div>
+          <% end %>
+        </div>
+    </div>
+    <div class="page"><%= will_paginate @users, :previous_label => '上一页', :next_label   => '下一页' %></div>
+  </div>
+</div>
+
+  <div id="search-dialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="searchDialogLabel" aria-hidden="true" style="" >
+       <form method="get" action="/search/result" style="margin:0;">
+       <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h3 style="text-align: center;">高级搜索</h3>
+        </div>
+        <div class="modal-body" style="padding-left:20px;">
+          <div id = "ajax_gif">
+            <img src ="/images/ajax_load.gif"></img>
+          </div>
+            <table>
+                <!--user start-->
+                <tr class="adv_input clearfix">
+                  <td>
+                    昵称：
+                  </td>
+                  <td class="conbox">
+                    <input type="text" name="screen_name" value="" class="W_inputStp">
+                  </td>
+                </tr>
+                <tr class="adv_input clearfix">
+                  <td>
+                    标签：
+                  </td>
+                  <td class="conbox">
+                    <input node-type="tag" suggest="true" type="text" name="tags" value="" class="W_inputStp">
+                  </td>
+                </tr>
+                <tr class="adv_input clearfix">
+                  <td>
+                    学校：
+                  </td>
+                  <td class="conbox">
+                    <input node-type="school" suggest="true" type="text" name="school" value=""
+                    class="W_inputStp">
+                  </td>
+                </tr>
+                <tr class="adv_input clearfix">
+                  <td>
+                    公司：
+                  </td>
+                  <td class="conbox">
+                    <input node-type="job" suggest="true" type="text" name="job" value="" class="W_inputStp">
+                  </td>
+                </tr>
+                <tr class="adv_user clearfix">
+                  <td>用户：</td>
+                  <td class="conbox">
+                    <select hidefocus="true" class="select2" name="v" node-type="auth" truevalue="all">
+                      <option value="all">所有用户</option>
+                      <option value="vip">认证用户</option>
+                      <option value="ord">普通用户</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr class="adv_add clearfix">
+                  <td>地点：</td>
+                  <td class="conbox">
+                    <select id="province_sel" onchange="load(this);" hidefocus="true" class="select2" name="province" node-type="prov" truevalue="0">
+                      <option value="all">
+                        省/直辖市
+                      </option>
+                      <option value="34">
+                        安徽
+                      </option>
+                      <option value="11">
+                        北京
+                      </option>
+                      <option value="50">
+                        重庆
+                      </option>
+                      <option value="35">
+                        福建
+                      </option>
+                      <option value="62">
+                        甘肃
+                      </option>
+                      <option value="44">
+                        广东
+                      </option>
+                      <option value="45">
+                        广西
+                      </option>
+                      <option value="52">
+                        贵州
+                      </option>
+                      <option value="46">
+                        海南
+                      </option>
+                      <option value="13">
+                        河北
+                      </option>
+                      <option value="23">
+                        黑龙江
+                      </option>
+                      <option value="41">
+                        河南
+                      </option>
+                      <option value="42">
+                        湖北
+                      </option>
+                      <option value="43">
+                        湖南
+                      </option>
+                      <option value="15">
+                        内蒙古
+                      </option>
+                      <option value="32">
+                        江苏
+                      </option>
+                      <option value="36">
+                        江西
+                      </option>
+                      <option value="22">
+                        吉林
+                      </option>
+                      <option value="21">
+                        辽宁
+                      </option>
+                      <option value="64">
+                        宁夏
+                      </option>
+                      <option value="63">
+                        青海
+                      </option>
+                      <option value="14">
+                        山西
+                      </option>
+                      <option value="37">
+                        山东
+                      </option>
+                      <option value="31">
+                        上海
+                      </option>
+                      <option value="51">
+                        四川
+                      </option>
+                      <option value="12">
+                        天津
+                      </option>
+                      <option value="54">
+                        西藏
+                      </option>
+                      <option value="65">
+                        新疆
+                      </option>
+                      <option value="53">
+                        云南
+                      </option>
+                      <option value="33">
+                        浙江
+                      </option>
+                      <option value="61">
+                        陕西
+                      </option>
+                      <option value="71">
+                        台湾
+                      </option>
+                      <option value="81">
+                        香港
+                      </option>
+                      <option value="82">
+                        澳门
+                      </option>
+                      <option value="400">
+                        海外
+                      </option>
+                      <option value="100">
+                        其他
+                      </option>
+                    </select>
+                  </td>
+                  <td class="conbox">
+                    <select id="city_sel" hidefocus="true" class="select2" name="city" node-type="city" truevalue="0">
+                      <option value="all">
+                        不限
+                      </option>
+                      <option value="0">
+                        城市/地区
+                      </option>
+                    </select>
+                  </td>
+                </tr>
+                <tr class="adv_age clearfix">
+                  <td>
+                    年龄：
+                  </td>
+                  <td class="conbox">
+                    <select hidefocus="true" name="age" class="select2">
+                      <option value="all">
+                        不限
+                      </option>
+                      <option value="18">
+                        18岁以下
+                      </option>
+                      <option value="22">
+                        19~22岁
+                      </option>
+                      <option value="29">
+                        23~29岁
+                      </option>
+                      <option value="39">
+                        30~39岁
+                      </option>
+                      <option value="40">
+                        40岁以上
+                      </option>
+                    </select>
+                  </td>
+                </tr>
+                <tr class="adv_sex clearfix">
+                  <td>
+                    性别：
+                  </td>
+                  <td class="conbox">
+                    <select hidefocus="true" class="select2" name="gender">
+                      <option value="all">
+                        不限
+                      </option>
+                      <option value="man">
+                        男
+                      </option>
+                      <option value="woman">
+                        女
+                      </option>
+                    </select>
+                  </td>
+                </tr>
+                <!--user end-->
+             </table>
+       </div>
+       <div class="modal-footer">
+          <table>
+           <tr class="p_btn clearfix">
+             <td>
+               &nbsp;
+             </td>
+             <td>
+               <input type="submit" id="submit-btn" class="btn btn-primary" value="搜索" />
+               <a href="" class="btn" aira-hidden="true">取消</a>
+             </td>
+           </tr>
+          </table>
+       </div>
+       </form>
+</div>
+
+<div id="export-dialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="exportDialogLabel" aria-hidden="true" style="" >
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 style="text-align: center;">生成数据文件</h3>
+  </div>
+  <div class="modal-body" style="padding-left:20px;">
+    <div id="progress-bar" class="progress progress-success progress-striped">
+      <div class="bar" style="width: 0%"></div>
+    </div>
+    <div>
+      <p><span></span></p>
+    </div>
+    <div id="download-link"></div>
+</div>
+
+
+

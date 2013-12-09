@@ -1,0 +1,2 @@
+#!/bin/bash
+grep 'tid' $1 |tail -n -1

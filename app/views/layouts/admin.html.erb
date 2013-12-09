@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>后台管理-微博工具箱</title>
+    <meta charset="utf-8">
+    <meta property="wb:webmaster" content="1654864b2e63516d" />
+    <link rel="shortcut icon" type="image/x-ico" href="/favicon.ico" />
+    <%= stylesheet_link_tag  "bootstrap/css/bootstrap-responsive", 
+    "bootstrap/css/bootstrap", :media => "all" %>
+    <%= javascript_include_tag  "jquery-1.7.2.min", "jquery.tmpl.min", "bootstrap/js/bootstrap.js", "highcharts" %>
+    <%= csrf_meta_tags %>
+    <style type="text/css">
+      body {
+        background-color: #fff;
+        padding-top: 100px;
+      }
+
+      a:hover {
+        text-decoration: none;
+      }
+
+      .footer {
+        text-align: center;
+        padding: 30px 0;
+        margin-top: 70px;
+        border-top: 1px solid #e5e5e5;
+        background-color: #f5f5f5;
+      }
+
+      a.btn_weibo {
+        display: block;
+        width: 173px;
+        height: 32px;
+        background: url(/images/btn_weibo.png) left top no-repeat;
+        text-indent: -999999px;
+      }
+
+      /*a#logout {
+        display:inline; 
+        color:#9c0001;
+        padding: 0;
+        margin: 0;
+        float:none;
+      }*/
+      
+      img#avatar {
+        width: 45px;
+        height: 45px;
+        margin-right: 4px;
+        border-radius: 2px;
+      }
+
+      a#weibo {
+        margin-top: 13px;
+      }
+
+      #ajax_gif {
+        text-align: center;
+        display: none;
+        margin-bottom: 20px;
+      }
+      #ajax_gif img {
+        width: 60px;
+      }
+
+      .container {
+        word-break: break-all;
+      }
+
+      .mini_pop_layer {
+        padding:7px 13px; 
+        border:1px solid #a0a0a0; 
+        -moz-border-radius:3px; 
+        -webkit-border-radius:3px; 
+        border-radius:3px; 
+        -moz-box-shadow:0 0 10px #777; 
+        -webkit-box-shadow:0 0 10px #777; 
+        box-shadow:0 0 10px #777;
+        border:5px solid #dfdfdf \9; 
+        background:#fff; 
+        font-size:12px;
+        position: absolute;
+        z-index: 999;
+        font-size: 14px;
+      }
+
+      .mini_pop_layer.erorr {
+        border-color: #b94a48;
+        color: #b94a48
+      }
+
+      .mini_pop_layer.succ {
+        border-color: #468847;
+        color: #468847
+      }
+
+    </style>
+    <script type="text/javascript">
+      var _bdhmProtocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+      document.write(unescape("%3Cscript src='" + _bdhmProtocol + "hm.baidu.com/h.js%3F328efcd2a3ab4927d17a24d216216df6' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+        $(function() {
+            //CSRF http post
+            var token = $('meta[name="csrf-token"]').attr('content');
+            $.ajaxSetup({
+              beforeSend: function(xhr) {
+                xhr.setRequestHeader('X-CSRF-Token', token)
+              }
+            });
+        })
+    </script>
+
+  </head>
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="/">后台管理</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="active"><a href="/status">Status</a></li>
+              <li><a href="/cooks">Cooks</a></li>
+              <li><a href="/distribution">Distribution</a></li>
+              <li><a href="/members">Members</a></li>
+            </ul>
+            <ul class="nav pull-right">
+              <% if session[:admin_id] %>
+              <li style="padding-top: 8px;">
+                  <span><%= Member.find_by_id(session[:admin_id]).name %>
+                    <a id="logout" href="/admin/logout">退出</a>
+                  </span>
+              </li>
+              <% else %>
+                <a href="/admin/login" class="btn">登录</a>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container" style="min-height: 500px;">
+      <%= yield %>
+    </div>
+
+    <div class="footer">
+      <div class="container">
+        <p>沪ICP备09015471号 2010 Digital-Right,Ltd. All rights reserved. </p>
+        <p>上海达睿网络科技有限公司 版权所有</p>
+      </div>
+    </div>
+  </body>
+</html>

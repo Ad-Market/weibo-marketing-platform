@@ -1,0 +1,105 @@
+<h1>用户ID:<%= @user.uid %></h1>
+
+<p id="notice"><%= notice %></p>
+
+<div  style="width:300px;margin-left:40px;">
+  <h2>基本信息</h2>
+  <table class="table table-condensed">
+    <tbody>
+      <tr>
+        <td>用户ID</td>
+        <td><%= @user.uid %></td>
+      </tr>
+      <tr>
+        <td>昵称</td>
+        <td><%= @user.screen_name %></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>省份代号</td>
+        <td><%= @user.userinfo_from_search.province %></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>城市代号</td>
+        <td><%= @user.userinfo_from_search.city %></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>粉丝数</td>
+        <td><%= @user.fans_count %></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>关注数</td>
+        <td><%= @user.followers_count %></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>微博数</td>
+        <td><%= @user.weibo_count %></td>
+        <td></td>
+      </tr>
+    </tbody>
+
+  </table>
+
+  <h2>联系信息</h2>
+  <table class="table table-condensed">
+    <tbody>
+      <tr>
+        <td>QQ</td>
+        <td><%= @user.qq %></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>EMAIL</td>
+        <td><%= @user.email %></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>MSN</td>
+        <td><%= @user.msn %></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>教育信息(TODO)</h2>
+  <table class="table table-condensed">
+    <tbody>
+      <%
+         schools = @user.school.split('$·')
+      %>
+      <% schools.each do |school| %>
+      <% unless school.empty? %>
+      <tr>
+        <td>教育信息</td>
+        <td><%= school %></td>
+        <td></td>
+      </tr>
+      <% end %>
+      <% end %>
+    </tbody>
+  </table>
+
+  <h2>公司信息(TODO)</h2>
+  <table class="table table-condensed">
+    <tbody>
+      <%
+         jobs = @user.job.split('$·')
+      %>
+      <% jobs.each do |job| %>
+      <% unless job.empty? %>
+      <tr>
+        <td>公司信息</td>
+        <td><%= job %></td>
+        <td></td>
+      </tr>
+      <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<%= link_to '返回', users_path %>

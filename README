@@ -1,0 +1,56 @@
+commands for running weibo crawlers:
+	- 运行search_crawler: 
+		1. (by keyword)rake WeiboCrawler:search[31,7,0,0,0,157,cookie_owner] RAILS_ENV=production>> ~/search_crawler.log
+		2. (by tag)rake WeiboCrawler:search_by_tag[31,7,0,0,0,157,cookie_owner] RAILS_ENV=production>> ~/search_crawler.log
+
+	- 运行contact_crawler:  
+		1. step 1: rake WeiboCrawler:contact[:limit, :mod_total ,:mod_num, :server, :start_uid] RAILS_ENV=production
+		   (e.g.)  rake WeiboCrawler:contact[1000, 30 ,1, zhejiang, 0] RAILS_ENV=production
+		2. step 2: rake WeiboCrawler:zero_contact[:limit, :mod_total ,:mod_num, :server, :start_uid] RAILS_ENV=production
+		   (e.g.)  rake WeiboCrawler:zero_contact[30 ,1, zhejiang, 31, 0] RAILS_ENV=production
+    3. step 3: rake WeiboCrawler:update_contact[:mod_total,mod_num,server,province_code, :start_uid] RAILS_ENV=production
+       (e.g.)  rake WeiboCrawler:update_contact[2,0,zhejiang,31,0] RAILS_ENV=production
+	- 运行mobile_crawler: 
+		1. step 1: rake WeiboCrawler:mobile[:limit, :mod_total ,:mod_num, :owner, :mode, :server, :start_uid] RAILS_ENV=production
+		   (e.g.)  rake WeiboCrawler:mobile[100,10,0,zhejiang11,wild,zhejiang,0] RAILS_ENV=production >> mnt/log/mobile_zhejiang_11
+		2. step 2: rake WeiboCrawler:empty_mobile[:limit, :mod_total ,:mod_num, :owner, :mode, :server, :start_uid] RAILS_ENV=production >> mnt/log/mobile_zhejiang_11
+		   (e.g.)  rake WeiboCrawler:empty_mobile[100,1,0,zhejiang11,wild,zhejiang,0] RAILS_ENV=production >> mnt/log/mobile_zhejiang_11
+
+
+	-统计tags
+	   rake Count:count_tag[31,1000,1,100] RAILS_ENV=production >> /mnt/logs/tag_log     
+
+branches we use:
+	- branch1 master
+	- branch2 weibo_marketing_sharding
+
+
+Mysql建表命令
+	备份命令例子：mysqldump -uroot weibo_marketing userinfo_from_searchs > table_userinfo_from_searchs_jiading_100000.sql
+
+	baseinfos表：设置uid为主键的命令alter table baseinfos add constraint PK_uid primary key(uid);
+	userinfo_from_searchs表：alter table userinfo_from_searchs add constraint PK_uid primary key(uid);
+
+other rake commands we use:
+	初始化时导入province和city的编码： rake Initializer:load_provinces
+
+	通过API获得指定用户的粉丝：rake WeiboCrawler:get_fans_of_user(uid)
+	通过手机版用户搜索页面搜索用户：rake WeiboCrawler:get_users_from_cell_page
+	通过网页版抓取用户联系信息：rake WeiboCrawler:get_contact_infos
+	搜索所有关键字进行用户搜索：rake WeiboCrawler:get_users_from_web_page[province,city,age,gender,auth,keyword_id,cookie_owner] >> ~/all_keywords.log
+  	
+	每日更新web cookie(推荐模式): 
+		- rake CookieUpdator:daily_update_web_cookies[shanghai] RAILS_ENV="production"
+		- rake CookieUpdator:daily_update_web_cookies[beijing] RAILS_ENV="production"
+		- rake CookieUpdator:daily_update_web_cookies[guangdong] RAILS_ENV="production"
+		- rake CookieUpdator:daily_update_web_cookies[zhejiang] RAILS_ENV="production"
+		- rake CookieUpdator:daily_update_web_cookies[jiangsu] RAILS_ENV="production"
+	更新mobile cookie:
+		- rake CookieUpdator:update_mobile_cookies[shanghai] RAILS_ENV="production"
+     补充cookie
+		- rake Initializer:add_cookies_to_group[account_unused] RAILS_ENV="production"
+	导出用户(注：时间中的空格用$)：
+            按市划分导出某省的用户：rake Exportor:export_users_of_a_province[beijing,2012-10-18=04:49:53] RAILS_ENV="production" >> /home/warren/weibo-marketing-platform/export/export_beijing.log
+            按关键字导出用户：rake Exportor:export_users_of_some_districts_of_shanghai[策划-设计-文案-平面] RAILS_ENV=production
+     合并users表数据:rake Initializer:migrate_to_users[100] RAILS_ENV="production" >> /home/warren/weibo-marketing-platform/export/merge_to_users.log      
+     建立索引：rake Initializer:index[100] RAILS_ENV="production" >> /home/warren/weibo-marketing-platform/export/build_index.log

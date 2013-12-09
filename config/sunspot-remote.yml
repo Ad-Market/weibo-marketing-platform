@@ -1,0 +1,50 @@
+production:
+  solr:
+    hostname: ssolr.bridge21.info
+    port: 80
+    master_hostname: msolr.bridge21.info
+    master_port: 80
+    path: '/solr/'
+    log_level: OFF
+    auto_commit_after_request: false
+    read_timeout: 500
+    open_timeout: 500
+  master_solr:
+    hostname: msolr.bridge21.info
+    port: 80
+    path: '/solr/'
+    log_level: OFF
+    auto_commit_after_request: false
+    read_timeout: 500
+    open_timeout: 500
+
+development:
+  solr:
+    hostname: ssolr.bridge21.info
+    port: 80
+    master_hostname: msolr.bridge21.info
+    master_port: 80
+    path: '/solr/'
+    log_level: OFF
+    auto_commit_after_request: false
+    read_timeout: 500
+    open_timeout: 500
+  master_solr:
+    hostname: msolr.bridge21.info
+    port: 80
+    path: '/solr/'
+    log_level: OFF
+    auto_commit_after_request: false
+    read_timeout: 500
+    open_timeout: 500
+
+
+test:
+  solr:
+    hostname: localhost
+    port: 8080
+    path: '/solr/'
+    log_level: OFF
+  auto_commit_after_request: false
+
+

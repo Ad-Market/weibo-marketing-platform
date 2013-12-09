@@ -1,0 +1,213 @@
+<style>
+  /*.span6 {
+    width:950px;
+  }
+  .container {
+    width:1000px;
+  }*/
+  textarea {
+    width: 100%;
+    padding: 0.5em;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+
+  table {
+    font-size: 11px;
+  }
+</style>
+<%= javascript_include_tag "knockout/knockout.js", "knockout/knockout.map.js", "utils.js" %>
+
+<script type="text/javascript">
+  function FriendsViewModel() {
+    var self = this;
+    self.textareaItem = $("#unfollow-box textarea")[0];
+    self.friends = ko.observableArray([]);
+
+    //  behaviour
+    self.addFriend = function (e) {
+        var temp_value = self.textareaItem.value;
+        self.textareaItem.value = temp_value + "," + e.id;
+    };
+
+   self.submitUids = function (e){
+      var temp_value = "";
+      if(self.friends()){
+        $.each(self.friends(),function(index,friend){
+           if(friend.is_unfollow){
+              temp_value += friend.id + ",";
+            }
+        });
+      }
+     if(temp_value.length!=0){
+      temp_value = temp_value.substr(0,temp_value.length-1);
+     }
+     self.textareaItem.value = temp_value;
+
+     // click the submit button
+     $("#unfollow-submit input").click();
+   };
+   self.loadFriends = function(){
+      self.friends.removeAll();
+      $.get("/weibo/ajax_get_friends",
+         {},
+         function(e){
+             $("#friends_list").show();
+             $("#submit_unfollow").show();
+             $.each(e,function(index,user){
+                   user.is_unfollow = false;
+                   self.friends.push(user);
+             });
+          },
+       "json");
+  };
+}
+
+$(document).ready(function() {
+    $("#friends_list").ajaxStart(function(){
+      $("#ajax_gif").css("display","block");
+    });
+    $("#friends_list").ajaxComplete(function(){
+      $("#ajax_gif").css("display","none");
+    });
+
+    //tab
+    var tabs = $('#tabs').find('li');
+    var well = $('.well');
+    var tab_id = "<%= @tab_id %>"==""?"follow":"<%= @tab_id %>";
+
+    tabs.find('a').each(function(index, item) {
+      $(item).on('click', function() {
+        $(item).tab('show');
+        $(well.hide().get(index)).show();
+      });
+    });
+
+    if(tab_id == "unfollow") {
+        $(tabs.find('a:nth-child(1)')).tab('show');
+        $(well.hide().get(1)).show();
+    } else {
+        $(tabs.find('a:nth-child(0)')).tab('show');
+        $(well.hide().get(0)).show();
+    }
+
+    var model = new FriendsViewModel();
+    ko.applyBindings(model);
+});
+
+</script>
+<div class="row-fluid" >
+  <div class="span3">
+               <ul class="nav  nav-pills nav-stacked" style="margin-top:40px;">
+                    <li class="">
+                      <a href="/search">微博搜人</a> 
+                    </li>
+                    <li class="active">
+                      <a href="#">关注工具</a> 
+                    </li>
+                    <li class="">
+                      <a href="/interactive">实时互动</a> 
+                    </li>
+                    <li class="">
+                      <a href="/lbs">LBS工具</a> 
+                    </li>
+                    <li class="">
+                      <a href="/repost/setting">定时转发</a> 
+                    </li>
+                    <li class="">
+                      <a href="/push">精准推送</a> 
+                    </li>
+                    <li class="">
+                      <a href="/competitor">竞品分析</a> 
+                    </li>
+                </ul>
+      </div>
+      <div class="span9" id="repost">
+        <% unless @notice.nil? %>
+          <div class="alert alert-success">
+              <%= @notice %>
+          </div>
+        <% end %>
+        <ul id="tabs" class="nav nav-tabs">
+            <li class="active">
+              <a>关注</a>
+            </li>
+            <li>
+              <a>取消关注</a>
+            </li>
+          </ul>
+          <!-- follow -->
+          <div class="well" id="follow-tab" style="display:none;" >
+              <form action="/follow/follow" method="get">
+                  <div id="follow-box">
+                    <textarea name="uids_to_follow" rows="8" value="" style="width:100%;"></textarea>  
+                    <p><font color="red">友情提示：</font>输入需要关注用户的昵称并用至少一个空格隔开，如姚晨 小S</p>
+                  </div>
+                  <div id="follow-submit" style="text-align: center;" >
+                    <input type="submit" value="批量关注" class="btn btn-primary"/>
+                  </div>
+                </form>
+          </div>
+          <!-- unfollow -->
+          <div class="well" id="unfollow-tab" style="display:none;" >
+                <!-- button - follower list -->
+                <div style="text-align: center;">
+                  <button class="btn btn-primary" data-bind="click: $root.loadFriends">获取关注列表</button>
+                  <input id="submit_unfollow" type="button" style= "display:none" value="批量取消已选用户" class="btn btn-primary" data-bind="click: $root.submitUids" />
+                </div>
+                <div id = "ajax_gif" style = "display:none;text-align: center;margin-top: 40px; ">
+                  <img src ="/images/ajax_load.gif"></img>
+                </div>
+                <!-- follower list -->
+                <div id="friends_list" style="display:none; margin-top: 20px;">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th style="width:50px;"></th>
+                        <th style="width:50px;"> 用户 </th>
+                        <th> 地区 </th>
+                        <th> 粉丝数 </th>
+                        <th> 关注数 </th>
+                        <th> 关注我 </th>
+                        <th> 认证 </th>
+                        <th style="width:100px;"> 备注 </th>
+                      </tr>
+                    </thead>
+                    <tbody data-bind="foreach: friends">
+                      <tr>
+                        <td><input style="display:inline" type="checkbox"  data-bind = "checked:is_unfollow" /></td>
+                        <td><img data-bind = "attr: { src: profile_image_url}"></img></td>
+                        <td class="checkbox" data-bind = "text:name"></td>
+                        <td class="checkbox" data-bind = "text:location"></td>
+                        <td class="checkbox" data-bind = "text:followers_count"></td>
+                        <td class="checkbox" data-bind = "text:bi_followers_count"></td>
+                        <td class="checkbox" data-bind = "text:follow_me"></td>
+                        <td class="checkbox" data-bind = "text:verified"></td>
+                        <td class="checkbox" data-bind = "text:description.textLimit(25)"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                <!-- box -->
+                <form action="/follow/unfollow" method="get" style="display:none;">
+                  <div id="unfollow-box">
+                    <textarea name="uids_to_unfollow" rows="8" columns="100" value=""></textarea>
+                    <span><font color="red">友情提示：</font>本功能可以通过点击下方"获取关注列表"链接，并在单选框选中需要取消关注的用户，然后点击提交，并点击输入框下方的批量取消关注按钮即可</span>
+                  </div>
+                  <div id="unfollow-submit" align="center" style="padding-top:10px" >
+                    <input type="submit" value="批量消除关注" class="btn-large btn-danger" style="width:150px;" />
+                  </div>
+                </form>
+                </div>
+              </div>
+      </div>
+</div>
+
+
+
+
+
+

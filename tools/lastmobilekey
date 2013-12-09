@@ -1,0 +1,2 @@
+#!/bin/bash
+tail -n100 $1 |grep 'uid: '|tail -n -1 | grep -o 'uid: [0-9]*' |grep -o [0-9]*

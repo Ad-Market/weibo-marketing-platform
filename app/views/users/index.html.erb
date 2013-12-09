@@ -1,0 +1,54 @@
+<div id="container" style="padding-top:10px;padding-left:5px;">
+  <h1>用户联系信息列表</h1>
+  <div id="user_list">
+    <div id="search" style="float:left;">
+      <input type="text" />
+      <select>
+        <option>按区域搜索</option>
+        <option>按用户ID搜索</option>
+      </select>
+      <input type="button" class="btn" style="height:28px;margin-bottom:8px;" value="搜索" />
+    </div>
+    <div id="export" style="float:right;">
+      <a href="users/export.csv">导出CSV格式</a>
+    </div>
+    <div style="clear:both;"></div>
+
+    <div>
+      <table class="table table-condensed">
+        <thread>
+          <tr>
+            <th>用户ID</th>
+            <th>用户昵称</th>
+            <th>省</th>
+            <th>市</th>
+            <th>性别</th>
+            <th>认证类型</th>
+            <th>年龄段</th>
+            <th>邮箱</th>
+            <th></th>
+          </tr>
+        </thread>
+
+        <tbody>
+          <% @users.each do |user| %>
+          <% unless user.screen_name.nil? || user.v.empty?  %>
+          <tr>
+            <td><%= user.uid %></td>
+            <td><%= user.screen_name %></td>
+            <td><%= user.province %></td>
+            <td><%= user.city %></td>
+            <td><%= user.gender %></td>
+            <td><%= user.v %></td>
+            <td><%= user.age %></td>
+            <td><%= user.email %></td>
+            <td><a href=<%= "/users/"+user.uid.to_s %>>详细信息</a></td>
+          </tr>
+          <% end %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <div class="digg_pagination"><%= will_paginate @users, :previous_label => '上一页', :next_label   => '下一页' %></div>
+  </div>
+</div>

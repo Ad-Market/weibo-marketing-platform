@@ -1,0 +1,31 @@
+PATH=/home/warren/.rvm/gems/ruby-1.9.2-p180/bin:/home/warren/.rvm/gems/ruby-1.9.2-p180@global/bin:/home/warren/.rvm/rubies/ruby-1.9.2-p180/bin:/home/warren/.rvm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+SHELL=/bin/bash
+MAILTO=root
+DISPLAY=:0.0
+
+# m h  dom mon dow   command
+0 1 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[guangdong] RAILS_ENV=production &>> /home/warren/update_cookie_guangdong.log
+30 1 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[zhejiang] RAILS_ENV=production &>> /home/warren/update_cookie_zhejiang.log
+0 2 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[jiangsu] RAILS_ENV=production &>> /home/warren/update_cookie_jiangsu.log
+30 2 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[shanghai] RAILS_ENV=production &>> /home/warren/update_cookie_shanghai.log
+0 3 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[beijing] RAILS_ENV=production &>> /home/warren/update_cookie_beijing.log
+30 3 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[jiangsu] RAILS_ENV=production &>> /home/warre$0 2 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[shanghai] RAILS_ENV=production &>> /home/warren/update_cookie_jiangsu.log
+0 4 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[guangdong] RAILS_ENV=production &>> /home/warren/update_cookie_guangdong.log
+30 4 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[zhejiang] RAILS_ENV=production &>> /home/warre$0 6 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[zhejiang] RAILS_ENV=production &>> /home/warren/update_cookie_zhejiang.log
+0 5 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[shanghai] RAILS_ENV=production &>> /home/warren/update_cookie_shanghai.log
+0 6 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[beijing] RAILS_ENV=production &>> /home/warren/update_cookie_beijing.log
+0 7 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[shanghai] RAILS_ENV=production &>> /home/warren/update_cookie_shanghai.log
+0 8 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[beijing] RAILS_ENV=production &>> /home/warren/update_cookie_beijing.log
+0 9 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[guangdong] RAILS_ENV=production &>> /home/warren/update_cookie_guangdong.log
+0 10 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[jiangsu] RAILS_ENV=production &>> /home/warren/update_cookie_jiangsu.log
+0 11 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[zhejiang] RAILS_ENV=production &>> /home/warren/update_cookie_zhejiang.log
+0 12 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[shanghai] RAILS_ENV=production &>> /home/warren/update_cookie_shanghai.log
+0 13 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[beijing] RAILS_ENV=production &>> /home/warren/update_cookie_beijing.log
+0 14 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[guangdong] RAILS_ENV=production &>> /home/warren/update_cookie_guangdong.log
+0 15 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[jiangsu] RAILS_ENV=production &>> /home/warren/update_cookie_jiangsu.log
+0 16 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[zhejiang] RAILS_ENV=production &>> /home/warren/update_cookie_jiangsu.log
+0 17 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[shanghai] RAILS_ENV=production &>> /home/warren/update_cookie_zhejiang.log
+0 18 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[beijing] RAILS_ENV=production &>> /home/warren/update_cookie_shanghai.log
+0 19 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[zhejiang] RAILS_ENV=production &>> /home/warren/update_cookie_jiangsu.log
+0 20 * * * cd /home/warren/projects/weibo-marketing-platform/ && /home/warren/.rvm/bin/rake CookieUpdator:daily_update_web_cookies[guangdong] RAILS_ENV=production &>> /home/warren/update_cookie_guangdong.log
+

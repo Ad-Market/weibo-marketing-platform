@@ -1,0 +1,2 @@
+module BaseinfosHelper
+end

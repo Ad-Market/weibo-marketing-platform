@@ -1,0 +1,58 @@
+<%= form_for(@member, :html=>{:class=>"form-horizontal well"}) do |f| %>
+  <% if @member.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@member.errors.count, "error") %> prohibited this member from being saved:</h2>
+
+      <ul>
+      <% @member.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <!--
+  <div class="field control-group">
+    <%= f.label :name, :class=>"control-label" %>
+    <div class="controls"><%= f.text_field :name %></div>
+  </div>
+  <div class="field control-group">
+    <%= f.label :role, :class=>"control-label" %>
+    <div class="controls"><%= f.text_field :role %></div>
+  </div>-->
+  <div class="field control-group">
+    <%= f.label :export_permission, "数据导出", :class=>"control-label" %>
+    <div class="controls"><%= f.check_box :export_permission %></div>
+  </div>
+  <div class="field control-group">
+    <%= f.label :follow_permission, "批量关注", :class=>"control-label" %>
+    <div class="controls"><%= f.check_box :follow_permission %></div>
+  </div>
+  <div class="field control-group">
+    <%= f.label :comm_permission, "实时互动", :class=>"control-label" %>
+    <div class="controls"><%= f.check_box :comm_permission %></div>
+  </div>
+  <div class="field control-group">
+    <%= f.label :lbs_permission, "LBS", :class=>"control-label" %>
+    <div class="controls"><%= f.check_box :lbs_permission %></div>
+  </div>
+  <div class="field control-group">
+    <%= f.label :repost_permission, "定时转发", :class=>"control-label" %>
+    <div class="controls"><%= f.check_box :repost_permission %></div>
+  </div>
+  <div class="field control-group">
+    <%= f.label :at_permission, "批量推送", :class=>"control-label" %>
+    <div class="controls"><%= f.check_box :at_permission %></div>
+  </div>
+  <div class="field control-group">
+    <%= f.label :bind_limit, "绑定数量", :class=>"control-label" %>
+    <div class="controls">
+      <%= f.text_field :bind_limit %>
+    </div>
+  </div>
+  <div class="control-group">
+    <div class="controls">
+      <%= f.submit :value=>"提交" %>
+    </div>
+  </div>
+<% end %>

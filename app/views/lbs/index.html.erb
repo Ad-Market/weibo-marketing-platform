@@ -1,0 +1,389 @@
+<style>
+  .btn-box {
+    text-align: center;
+    padding: 10px;
+  }
+  .btn-box button {
+    margin: 0 6px;
+  }
+
+  span.location {
+    color: #777;
+    text-shadow: 0 1px 0 #fff;
+  }
+
+  dt {
+      float:left;
+  }
+
+  dd {
+    margin-left: 60px;
+  }
+
+  #weibo_list, #user_list {
+    font-size: 11px;
+  }
+
+  #baiduMap {
+      width:400px;
+      height:280px;
+      border:1px solid #ccc;
+      float:left;
+  }
+
+</style>
+<%= javascript_include_tag "knockout/knockout.js", "knockout/knockout.map.js", "utils.js" %>
+<!-- baidu map -->
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=1.5&ak=909573084b397b8af6d1f2666f474560"></script>
+<script type="text/javascript">
+  //place value
+  var _lat;
+  var _lng;
+  var _model;
+
+  function ViewModel() {
+    var self = this;
+    self.weibos = ko.observableArray([]);
+    self.users = ko.observableArray([]);
+    self.searchPlace = ko.observable();
+
+    //compute display text 
+    this.displaySearchPlace = ko.computed(function() {
+        return self.searchPlace()==undefined? "当前无搜索地点":self.searchPlace();
+    }, this);
+
+    //  behaviour
+    self.isShowRepostField=function(weibo){
+      return weibo.repost_user_name()!=undefined;
+    };
+
+    self.isShowPicField = function (weibo) {
+      return weibo.thumbnail_pic!=undefined; //is show  oraginal pic
+    };
+     
+    self.exportWeibo = function () {
+      if(self.weibos().length==0) {alert("请先点击获取微博."); return;}
+      var head = {
+        user_name:"用户名", 
+        weibo_content:"微博内容"
+      }
+      var csv = generateCSVHtml(head,self.weibos());
+      $('#exportField').val(csv);
+      $('#export').click();
+    };
+
+   self.exportUser =function(){
+     if(self.users().length==0) {alert("请先点击获取用户."); return;}
+      var head = {
+        uid:"uid",
+        screen_name:"用户名", 
+        gender:"性别",
+        description:"描述",
+        distance:"距离",
+        followers_count:"粉丝数",
+        friends_count:"关注数",
+        verified:"认证"     
+      }
+      var csv = generateCSVHtml(head,self.users());
+      $('#exportField').val(csv);
+      $('#export').click();
+   };
+   
+   function generateCSVHtml(head,datas){
+      var headAttrs = [];
+      for(var attr in head)
+        headAttrs.push(head[attr]);
+      var result = headAttrs.join(",") + "$$";
+      datas.forEach(function(data){
+        var content =[];
+        for(var attr in head)
+          content.push(data[attr]);
+        result += content.join(",") + "$$";
+      });
+      return result;
+   }
+
+   self.getNearbyTimeline = function (e){
+      var startTime = 0;
+      var endTime = Math.round(new Date().getTime()/1000);
+      $('#container_tab a:first').tab('show');
+      self.weibos.removeAll();
+      $.ajax({                 
+        url:'/weibo/ajax_nearby_timeline',
+        data: {lat:_lat,lng:_lng,start:startTime,end:endTime},                                                                             
+        traditional: true,
+        dataType: 'json',
+        type: 'GET',
+        success: function (data) {
+          if(data.error) return;
+          $.each(data["statuses"],function(i,status){
+            var weibo = {};
+            //user info
+            weibo["user_image"] = status.user.avatar_large;
+            weibo["user_name"] =  status.user.name;
+            //weibo info 
+            weibo["is_original"] = status.retweeted_status== undefined ? true:false;
+            weibo["weibo_id"] = status.id;
+            weibo["weibo_content"] = status.text;
+            weibo["weibo_create_time"] = (new Date(status.created_at.replace('+0800', 'UTC+0800')).toNiceTime());
+            weibo["source"] = status.source;
+            weibo["original_pic"] = status.original_pic;
+            weibo["thumbnail_pic"] = status.thumbnail_pic;
+            weibo["repost_text"] = ko.observableArray();
+            weibo["repost_user_name"] = ko.observable();
+            weibo["repost_source"] = ko.observable();
+            weibo["repost_create_time"] = ko.observable();
+            weibo["repost_original_pic"] = ko.observable();
+            weibo["repost_thumbnail_pic"] = ko.observable();
+
+            if(status.retweeted_status!= undefined){ //repost
+              weibo.repost_text = status.retweeted_status.text;
+              weibo.repost_user_name = status.retweeted_status.user.name;
+              weibo.repost_source = status.retweeted_status.source;
+              weibo.repost_create_time = (new Date(status.created_at.replace('+0800', 'UTC+0800')).toNiceTime());
+              weibo.repost_original_pic = status.retweeted_status.original_pic;
+              weibo.repost_thumbnail_pic = status.retweeted_status.thumbnail_pic;
+            }
+            self.weibos.push(weibo);
+          });
+        }
+      });
+   };
+   
+   self.getNearbyUser = function (e){
+    var startTime = 0; 
+    var endTime = Math.round(new Date().getTime()/1000);
+    $('#container_tab a:last').tab('show');
+    self.users.removeAll();  
+    $.ajax({                 
+        url:'/weibo/ajax_nearby_users',
+        data: {lat:_lat,lng:_lng,start:startTime,end:endTime}, 
+        traditional: true,
+        dataType: 'json',
+        type: 'GET',
+        success: function (data) {
+            if(data.error) return;
+            $.each(data["users"],function(i,u){
+              var user = {};
+              user["uid"] = u.id;
+              user["created_at"] = (new Date(u.created_at.replace('+0800', 'UTC+0800')).toNiceTime());
+              user["profile_image_url"] = u.profile_image_url;
+              user["description"] = u.description;
+              user["distance"] = u.distance;
+              user["followers_count"] = u.followers_count;
+              user["friends_count"] = u.friends_count;
+              user["gender"] = u.gender == "f"?"女":"男";
+              user["last_at"] = u.last_at;
+              user["location"] = u.location;
+              user["name"] = u.name;
+              user["screen_name"] = u.screen_name;
+              user["statuses_count"] = u.statuses_count;
+              user["verified"] = u.verified == false? "否":"是";
+              self.users.push(user);
+            });
+          }
+      });
+   };
+
+  }
+
+$(document).ready(function() {
+    $("#ajax_container").ajaxStart(function(){
+      $("#ajax_gif").show();
+      // $("#ajax_container").hide();
+    });
+    $("#ajax_container").ajaxComplete(function(){
+      $("#ajax_gif").hide();
+      // $("#ajax_container").show();
+    });
+    _model = new ViewModel();
+    ko.applyBindings(_model);
+    //add tab handler
+    
+    $('#container_tab a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+     });
+});
+
+</script>
+
+<div class="row-fluid" >
+  <div class="span3">
+           <ul class="nav  nav-pills nav-stacked" style="margin-top:40px;">
+                <li class="">
+                  <a href="/search">微博搜人</a> 
+                </li>
+                <li class="">
+                  <a href="/follow">关注工具</a> 
+                </li>
+                <li class="">
+                  <a href="/interactive">实时互动</a> 
+                </li>
+                <li class="active">
+                  <a href="#">LBS工具</a> 
+                </li>
+                <li class="">
+                  <a href="/repost/setting">定时转发</a> 
+                </li>
+                <li class="">
+                  <a href="/push">精准推送</a> 
+                </li>
+                <li class="">
+                  <a href="/competitor">竞品分析</a> 
+                </li>
+            </ul>
+      </div>
+      <div class="span9">
+        <div class="well clearfix">
+            <div id="baiduMap"></div>
+            <div style="margin-left:420px;">
+                地理位置:<br>
+                <input type="text"  autofocus="autofocus" id="suggestId" placeHoloder="地理位置"/><br>
+                当前地点:<br>
+                <span class="location" data-bind="text:displaySearchPlace"></span>
+                <div class="btn-box">
+                  <button class="btn btn-primary" data-bind="click: $root.getNearbyTimeline">获取微博</button>
+                  <button class="btn btn-primary" data-bind="click: $root.getNearbyUser">
+                    获取用户</button>
+                </div>
+                <div class="btn-box">
+                  <button class="btn" data-bind="click: $root.exportWeibo">导出微博</button>
+                  <button class="btn" data-bind="click: $root.exportUser">导出用户</button>     
+                </div>
+          </div>
+        </div>
+        <div id = "ajax_container" style="margin-top:20px;">
+            <!-- tabs -->
+            <ul class="nav nav-tabs" id="container_tab">
+              <li class="active"><a href="#weibos">周边微博</a></li>
+              <li><a href="#users">周边用户</a></li>
+            </ul>
+             <!-- tabs  content-->
+            <div class="tab-content">
+                <div id = "ajax_gif" style = "text-align:center;display:none; margin-top:20px;">
+                  <img src ="images/ajax_load.gif"></img>
+                </div>
+                <div class="tab-pane active" id="weibos">
+                  <div id="weibo_list" >
+                    <div class="feed_lists W_linka W_texta" pagenum="1" node-type="feed_list" data-bind="foreach: weibos">
+                      <dl action-type="feed_list_item" class="feed_list W_linecolor">
+                        <div class="people">
+                          <dt class="face">
+                            <img alt="" style="max-width:50px;" data-bind = "attr: { src: user_image}">
+                          </dt>
+                          <dd class="content">
+                            <p node-type="feed_list_content">
+                              <a data-bind = "text:user_name"></a>：
+                              <span data-bind = "text:weibo_content"></span>
+                            </p>
+                            <ul class="piclist" node-type="feed_list_media_prev" data-bind="visible:$root.isShowPicField($data)" >
+                              <img alt="" data-bind = "attr: { src: thumbnail_pic}" >
+                            </ul>
+                            <dl class="comment W_textc W_linecolor W_bgcolor" data-bind="visible:$root.isShowRepostField($data)">
+                              <dt node-type="feed_list_forwardContent">
+                                <a span data-bind = "text:repost_user_name"></a>
+                                <em data-bind = "text:repost_text"></em>
+                              </dt>
+                              <dd node-type="feed_list_media_prev">
+                                <img alt="" data-bind = "attr: { src: repost_thumbnail_pic}">
+                              </dd>
+                            </dl>
+                            <p class="info W_linkb W_textb">
+                              <a data-bind = "text:weibo_create_time"></a>
+                              来自<a data-bind = "html:source"></a>
+                            </p>
+                          </dd>
+                          <dd class="clear"></dd>
+                        </div>
+                      </dl>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane" id="users">
+                  <div id = "user_list">
+                  <table class="table" >
+                    <thead>
+                      <tr>
+                        <th style="width:50px;"></th>
+                        <th style="width:50px;"> 用户 </th>
+                        <th>性别</th>
+                        <th> 地区 </th>
+                        <th> 距离 </th>
+                        <th> 粉丝数 </th>
+                        <th> 关注数 </th>
+                        <th> 认证 </th>
+                        <th style="width:100px;"> 标签 </th>
+                      </tr>
+                    </thead>
+                    <tbody data-bind="foreach: users">
+                      <tr>
+                        <td><img data-bind = "attr: { src: profile_image_url}"></img></td>
+                        <td class="checkbox" data-bind = "text:screen_name"></td>
+                        <td class="checkbox" data-bind = "text:gender"></td>
+                        <td class="checkbox" data-bind = "text:location"></td>
+                        <td class="checkbox" data-bind = "text:distance"></td>
+                        <td class="checkbox" data-bind = "text:followers_count"></td>
+                        <td class="checkbox" data-bind = "text:friends_count"></td>
+                        <td class="checkbox" data-bind = "text:verified"></td>
+                        <td class="checkbox" data-bind = "text:description.textLimit(25)"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  </div> 
+                </div>
+            </div>
+            <form action="/lbs/export" method="post" style="display:none;">
+              <input type="hidden" name="authenticity_token" value="">
+              <input id = "exportField" type="text" name="name"/>
+              <input id="export" type="submit" value="Submit"/>
+            </form>
+    </div>
+</div>  
+
+<script type="text/javascript">
+
+function G(id) {
+    return document.getElementById(id);
+}
+
+var map = new BMap.Map("baiduMap");
+var point = new BMap.Point(116.3964,39.9093);
+map.centerAndZoom(point,13);
+map.enableScrollWheelZoom();
+
+var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
+    {"input" : "suggestId"
+    ,"location" : map
+});
+
+
+ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+   var _value = e.item.value;
+    _model.searchPlace(_value.province +  _value.city +  _value.district +  _value.street +  _value.business);
+    setPlace();
+});
+
+function setPlace(){
+    map.clearOverlays();    //清除地图上所有覆盖物
+    function myFun(){
+        var pp = local.getResults().getPoi(0).point;    //获取第一个智能搜索的结果i
+        _lat = pp.lat;
+        _lng = pp.lng;
+        map.centerAndZoom(pp, 18);
+        map.addOverlay(new BMap.Marker(pp));    //添加标注
+    }
+    var local = new BMap.LocalSearch(map, { //智能搜索
+      onSearchComplete: myFun
+    });
+    local.search(_model.searchPlace());
+}
+</script>
+
+
+
+
+
+
+
+

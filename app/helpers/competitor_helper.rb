@@ -1,0 +1,2 @@
+module CompetitorHelper
+end

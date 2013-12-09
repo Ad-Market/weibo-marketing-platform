@@ -1,0 +1,48 @@
+production:
+  solr:
+    hostname: 192.168.20.148
+    port: 8080
+    master_hostname: 192.168.15.242
+    master_port: 8080
+    path: '/solr/'
+    log_level: OFF
+    auto_commit_after_request: false
+    read_timeout: 5000
+    open_timeout: 5000
+  master_solr:
+    hostname: 192.168.15.242
+    port: 8080
+    path: '/solr/'
+    log_level: OFF
+    auto_commit_after_request: false
+
+development:
+  solr:
+    hostname: 192.168.20.148
+    port: 8080
+    master_hostname: 192.168.15.242
+    master_port: 8080
+    path: '/solr/'
+    log_level: OFF
+    auto_commit_after_request: false
+    read_timeout: 5000
+    open_timeout: 5000
+  master_solr:
+    hostname: 192.168.15.242
+    port: 8080
+    path: '/solr/'
+    log_level: OFF
+    auto_commit_after_request: false
+    read_timeout: 50
+    open_timeout: 50
+
+
+test:
+  solr:
+    hostname: localhost
+    port: 8080
+    path: '/solr/'
+    log_level: OFF
+  auto_commit_after_request: false
+
+

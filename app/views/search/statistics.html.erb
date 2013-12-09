@@ -1,0 +1,239 @@
+<style>
+.charts {
+    display:table; 
+  }
+
+.charts .chart {
+    display:table-cell; 
+    vertical-align:middle;
+    
+    width: 470px;
+    height: 470px;
+    
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.charts .error {
+  color: #b94a48;
+  font-weight: 600;
+}
+
+</style>
+
+<div class="alert alert-success">
+  <b>用户搜索结果统计 关键字: </b> <%= @key %>
+</div>
+
+
+<div class="charts">
+    <div id="province-container" class="chart">
+      <div name="loading" class="loading">
+        <img src ="/images/ajax_load.gif"/> 
+      </div>
+    </div>
+    <div id="gender-container" class="chart">
+      <div name="loading" class="loading">
+        <img src ="/images/ajax_load.gif"/> 
+      </div>
+    </div>
+</div>
+<div class="charts">
+    <div id="v-container" class="chart">
+      <div name="loading" class="loading">
+        <img src ="/images/ajax_load.gif"/> 
+      </div>
+    </div>
+    <div id="age-container" class="chart">
+      <div name="loading" class="loading">
+        <img src ="/images/ajax_load.gif"/> 
+      </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+  var fail_html_template = '<span class="error">未加载成功</span>';
+
+  function load_count_groupby_province(){
+    url = "/search/get_count_of_users_groupby_province.json?<%= request.query_string %>";
+    $.get(url,
+      {},
+      function(result){
+        chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'province-container',
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false
+            },
+            title: {
+                text: '微博用户地理分布'
+            },
+            tooltip: {
+        	    pointFormat: '{series.name}: <b>{point.percentage}%</b>',
+            	percentageDecimals: 1
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        color: '#000000',
+                        connectorColor: '#000000',
+                        formatter: function() {
+                            return '<b>'+ this.point.name +'</b>: '+ this.point.y;
+                        }
+                    }
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: '百分比',
+                data: result.provinces
+            }]
+        });
+      },
+      "json")
+      .fail(function(){$("#province-container div[name=loading]").html(fail_html_template);})
+      .always(function() { load_count_groupby_gender(); });
+  }
+
+  function load_count_groupby_gender(){
+    url = "/search/get_count_of_users_groupby_gender.json?<%= request.query_string %>";
+    $.get(url,
+      {},
+      function(result){
+        chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'gender-container',
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false
+            },
+            title: {
+                text: '性别分布'
+            },
+            tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage}%</b>',
+                percentageDecimals: 1
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        color: '#000000',
+                        connectorColor: '#000000',
+                        formatter: function() {
+                            return '<b>'+ this.point.name +'</b>: '+ this.point.y;
+                        }
+                    }
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: '百分比',
+                data: result.genders
+            }]
+        });
+      },
+      "json")
+      .fail(function(){$("#gender-container div[name=loading]").html(fail_html_template);})
+      .always(function() { load_count_groupby_v(); });
+  }
+
+
+
+  function load_count_groupby_v(){
+    url = "/search/get_count_of_users_groupby_v.json?<%= request.query_string %>";
+    $.get(url,
+      {},
+      function(result){
+        chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'v-container',
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false
+            },
+            title: {
+                text: '类型分布'
+            },
+            tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage}%</b>',
+                percentageDecimals: 1
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        color: '#000000',
+                        connectorColor: '#000000',
+                        formatter: function() {
+                            return '<b>'+ this.point.name +'</b>: '+ this.point.y;
+                        }
+                    }
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: '百分比',
+                data: result.vs
+            }]
+        });
+      },
+      "json")
+      .fail(function(){$("#v-container div[name=loading]").html(fail_html_template);})
+      .always(function() { load_count_groupby_age(); });
+  }
+
+  function load_count_groupby_age(){
+    url = "/search/get_count_of_users_groupby_age.json?<%= request.query_string %>";
+    $.get(url,
+      {},
+      function(result){
+        chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'age-container',
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false
+            },
+            title: {
+                text: '年龄分布'
+            },
+            tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage}%</b>',
+                percentageDecimals: 1
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        color: '#000000',
+                        connectorColor: '#000000',
+                        formatter: function() {
+                            return '<b>'+ this.point.name +'</b>: '+ this.point.y;
+                        }
+                    }
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: '百分比',
+                data: result.ages
+            }]
+        });
+      },
+      "json")
+      .fail(function(){$("#age-container div[name=loading]").html(fail_html_template);})
+  }
+
+  load_count_groupby_province();
+</script>

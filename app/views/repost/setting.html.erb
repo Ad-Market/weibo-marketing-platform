@@ -1,0 +1,318 @@
+<%= javascript_include_tag "knockout/knockout.js", "knockout/knockout.map.js", "bootstrap/js/bootstrap-validation.js", "utils.js" %>
+
+<style type="text/css">
+	.repost {
+		/*border-bottom: 1px solid #ccc;*/
+		margin-top: 50px;
+	}
+
+	#repost .control-label {
+		padding-top: 0;
+	}
+
+	#repost label {
+		display: inline;
+	}
+
+	#repost i {
+		/*vertical-align: text-bottom;*/
+	}
+
+	#repost .img {
+		height: 30px;
+	}
+
+	#repost strong {
+		font-weight: 800;
+	}
+
+	#repost .popover {
+		display: block;
+		width: auto;
+	}
+	#repost .popover span {
+		line-height: 50px;	
+		color: #989898;
+	}
+
+	#loading {
+		text-align: center;
+	}
+
+	#form {
+		display: none;
+	}
+</style>
+<div class="row-fluid" >
+	<div class="span3">
+      	       <ul class="nav  nav-pills nav-stacked" style="margin-top:40px;">
+	                  <li class="">
+	                    <a href="/search">微博搜人</a> 
+	                  </li>
+	                  <li class="">
+	                    <a href="/follow">关注工具</a> 
+	                  </li>
+	                  <li class="">
+	                    <a href="/interactive">实时互动</a> 
+	                  </li>
+	                  <li class="">
+	                    <a href="/lbs">LBS工具</a> 
+	                  </li>
+	                  <li class="active">
+	                    <a href="#">定时转发</a> 
+	                  </li>
+	                  <li class="">
+	                    <a href="/push">精准推送</a> 
+	                  </li>
+	                  <li class="">
+	                    <a href="/competitor">竞品分析</a> 
+	                  </li>
+                </ul>
+    	</div>
+        	<div class="span9" id="repost">
+        		<div id="loading">
+        			<img src="/images/ajax_load.gif" alt="">
+        		</div>
+        		<form id="form" style="display: none;">
+        			<div class="repost form-horizontal">
+	        		<div class="alert alert-error" data-bind="visible: !is_editing() && big_accounts().length==0">
+		              	<strong>提示!</strong> 您还没有添加被转发账号，请点击编辑按钮添加。
+		           </div>
+	        		<div class="control-group" data-bind="visible: is_editing">
+				<label class="control-label"><a class="btn btn-primary btn-small" data-bind="click: add_big_account"><i class="icon-plus-sign icon-white"></i> 添加被转发账号</a></label>
+			</div>
+			<div data-bind="foreach: big_accounts.slice(0).reverse()">
+    	    		<div class="form-horizontal">
+    				<div class="control-group">
+    					<label class="control-label"><strong>被转发账号昵称</strong></label>
+    					<div class="controls" style="position:relative;">
+    						<label data-bind="text: screen_name, visible: !$root.is_editing()"></label>
+    						<input type="text" check-type="required" placeholder="昵称" data-bind="value: screen_name, visible: $root.is_editing(),  event: { blur: check_screen_name}">
+    						<a class="btn btn-small" data-bind="visible: $root.is_editing(), click: $parent.delete_big_account"><i class="icon-remove-sign icon"></i>删除</a>
+    						<div class="popover fade right in" style="top: -18px; left: 300px; display: block;" data-bind="value: screen_name, visible: is_checking"><div class="arrow"></div>
+    						<div class="popover-content">
+    							<img src="/images/ajax_load.gif" style="width: 50px;" alt="">
+    							<span>没有找到..</span>
+    						</div></div>
+    					</div>
+    				</div>
+    			  	<div class="control-group" data-bind="visible: $root.is_editing()">
+    			    		<label class="control-label" for="bigAccount">
+    			    		</label>
+    			    		<div class="controls">
+    			    			<a class="btn btn-small" data-bind="click: add_small_account"><i class="icon-user icon"></i> 添加转发账号</a>
+    			    		</div>
+    				</div>
+    				<div data-bind="foreach: small_accounts.slice(0).reverse()">
+    					<div class="control-group">
+	    			    		<label class="control-label" for="bigAccount">
+	    			    			转发账号
+	    			    		</label>
+	    			    		<div class="controls">
+	    			    			<label data-bind="text: username, visible: !$root.is_editing()"></label>
+			  				<input type="text" check-type="required" placeholder="用户名" data-bind="value: username, visible: $root.is_editing()">
+					  		<input type="text" check-type="required" placeholder="密码" data-bind="value: password, visible: $root.is_editing()">
+					  		<a class="btn btn-small" data-bind="visible: $root.is_editing(), click: $parent.delete_small_account"><i class="icon-remove-sign icon"></i>删除</a>
+					  		<span class="label label-success" data-bind="visible: status() == 1 && !$root.is_editing()">Success</span>
+					  		<span class="label label-important" data-bind="visible: status() == -1 && !$root.is_editing()">Error</span>
+			    			</div>
+	    				</div>
+    				</div>
+    			</div>
+    		</div> 
+		</div>
+        		<div class="repost form-horizontal">
+	        		<div class="control-group" data-bind="visible: $root.is_editing()">
+				<label class="control-label"><a class="btn btn-primary btn-small" data-bind="click: add_comment_statement"><i class="icon-comment icon-white"></i> 添加转发评论语</a></label>
+			</div>
+			<div data-bind="foreach: comments.slice(0).reverse()">
+				<div class="control-group">
+					<label class="control-label"><strong>评论语</strong></label>
+					<div class="controls">
+						<label data-bind="text: comment, visible: !$root.is_editing()"></label>
+						<input type="text" check-type="required" placeholder="评论语" data-bind="value: comment, visible: $root.is_editing()">
+						<a class="btn btn-small" data-bind="visible: $root.is_editing(), click: $parent.delete_comment"><i class="icon-remove-sign icon"></i>删除</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="repost form-horizontal" >
+    			<div class="control-group">
+				<label class="control-label"><strong>转发间隔(分钟)</strong></label>
+				<div class="controls">
+					<label data-bind="text: repost_interval, visible: !$root.is_editing()"></label>
+					<input type="text"  check-type="number" class="input-small"placeholder="分钟" data-bind="value: repost_interval, visible: $root.is_editing()">
+				</div>
+			</div>
+			<div class="control-group" >
+				<label class="control-label"></label>
+				<div class="controls">
+					<button id="save" class="btn btn-primary"  type="submit" data-loading-text="loading..." data-bind="click: submit, visible: $root.is_editing()" >保存</button>
+					<button id="edit" class="btn btn-primary" data-bind="click: eidit, visible: !$root.is_editing()">编辑</button>
+				</div>
+			</div>		
+		</div>
+        		</form>
+        	</div>
+</div>
+
+<script type="text/javascript">
+	$(function() {
+		var btn_save = $('#save');
+		var btn_edit = $('#edit');
+		var form = $('#form');
+		var loading  = $('#loading');
+
+		var mapping = {
+		    	'big_accounts': {
+		        		create: function(options) {
+		        			return new big_account(options.data);
+		        		}
+		    	}
+		}
+
+		var big_account = function(data) {
+			this.uid = ko.observable();
+			this.screen_name = ko.observable('');
+
+			this.is_checking = ko.observable(false);
+			this.has_checked = ko.observable(false);
+
+			this.small_accounts = ko.observableArray([]);
+
+			this.add_small_account = function() {
+		    		this.small_accounts.push({
+		    			username: ''
+		    			, password: ''
+		    			, status: ko.observable(1)
+		    			, id: ko.observable()
+		    		});
+		    	}.bind(this);
+
+		    	this.delete_small_account = function(data) {
+		    		this.small_accounts.remove(data);
+		    	}.bind(this);
+
+		    	this.check_screen_name = function(data, event) {
+		    		event = event || window.event;
+		    		var el = $(event.target || event.srcElement);
+		    		var self = this;
+		    		var name = el.val().trim();
+		    		if (name.length == 0)  return;
+		    		
+	    			var img = $(el.parents('.controls').find('.popover img')).show();
+	    			var span = $(el.parents('.controls').find('.popover span')).hide();
+
+	    			img.attr('src', '/images/ajax_load.gif');
+	    			self.is_checking(true);
+
+		       		$.get('/weibo/uid', {name: name}, function(data) {
+		       			// console.log(data);
+
+    		       			if(data.avatar) {
+		        				img.attr('src', data.avatar);
+		        				self.uid(data.uid);
+		    				self.has_checked(true);
+		    			} else {
+		    				img.hide();
+		    				span.show();
+		    			}
+				});
+			};
+
+		    	ko.mapping.fromJS(data, mapping, this);
+		}
+		 
+		var viewModel = function() {
+			this.is_editing = ko.observable(false);
+			this.big_accounts = ko.observableArray([]);
+			this.comments = ko.observableArray([]);
+			this.repost_interval = ko.observable(0);
+
+		        	this.add_big_account = function() {
+		        		this.big_accounts.push(new big_account({
+		        			screen_name:''
+		        			, small_accounts: []
+		        			, uid: null
+		        		}));
+		        	}.bind(this);
+
+		        	this.delete_big_account = function(data) {
+		        		this.big_accounts.remove(data);
+		        	}.bind(this);
+
+	        	    	this.add_comment_statement = function() {
+	        			this.comments.push({comment: '', id: null});
+	        	    	}.bind(this);
+
+	        	    	this.delete_comment = function(data) {
+	        	    		this.comments.remove(data);
+	        	    	}.bind(this);
+
+		        	this.submit = function() {
+		        		btn_save.button('loading');
+		        		form.submit();
+	        		}.bind(this);
+
+	        		this.save = function() {
+	        			var data = ko.mapping.toJS(this);
+	        			// console.log(JSON.stringify(data));
+
+				$.ajax({
+					url: '/repost/setting'
+					, type: "POST"
+					, data: JSON.stringify(data)
+					, dataType: 'json'
+					, contentType: 'application/json'
+					, success: function(result) {
+						// console.log(result);
+						if (result.status == 1) {
+							$(btn_save).displayInfo({
+								status: 1
+								, info: '保存成功'
+								, callback: function() {
+									window.location.reload();
+								}
+							});
+						} else {
+							$(btn_save).displayInfo({
+								status: 0
+								, info: '保存失败'
+							});
+						}
+
+						btn_save.button('reset');
+					}
+				})
+	        		}.bind(this);
+
+		        	this.eidit = function() {
+		        		this.is_editing(true);
+		        	}.bind(this);
+
+		        	this.fech = function() {
+		        		var self = this;
+		        		$.get('/repost/setting.json', function(data) {
+		        			// console.log(data);
+		        			loading.remove();
+		        			form.show();
+
+		        			ko.mapping.fromJS(data, mapping, self);
+	  			}, 'json');
+		        	}.bind(this);
+		}
+		
+		var model = new viewModel();
+		ko.applyBindings(model);
+		model.fech();	
+		
+		form.validation({
+			sucCallback: function() {
+				model.save();
+			}
+			, errorCallback: function() {
+				btn_save.button('reset');
+			}
+		});
+	});
+</script>

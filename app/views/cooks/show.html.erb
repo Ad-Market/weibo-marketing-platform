@@ -1,0 +1,45 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Content:</b>
+  <%= @cook.content %>
+</p>
+
+<p>
+  <b>Owner:</b>
+  <%= @cook.owner %>
+</p>
+
+<p>
+  <b>Username:</b>
+  <%= @cook.username %>
+</p>
+
+<p>
+  <b>Password:</b>
+  <%= @cook.passwd %>
+</p>
+
+<p>
+  <b>Page type:</b>
+  <%= @cook.page_type %>
+</p>
+
+<p>
+  <b>是否过期:</b>
+  <%= @cook.expired %>
+</p>
+
+<p>
+  <b>是否访问频繁:</b>
+  <%= @cook.frequent %>
+</p>
+
+<p>
+  <b>备注:</b>
+  <%= @cook.remark %>
+</p>
+
+
+<%= link_to 'Edit', edit_cook_path(@cook) %> |
+<%= link_to 'Back', cooks_path %>

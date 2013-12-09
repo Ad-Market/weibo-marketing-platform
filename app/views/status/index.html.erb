@@ -1,0 +1,506 @@
+<style type="text/css">
+  .label {
+    font-size:18px;
+  }
+  .count {
+    padding-left:10px;
+    font-size:18px;
+    color:red;
+  }
+</style>
+
+<script type="text/javascript">
+  gif_template = "<img src='/images/admin-ajax-loader.gif' />";
+  $(document).ready(function(){
+    //load_total_user_status("beijing");
+    //load_total_user_status("guangdong");
+    //load_total_user_status("shanghai");
+    //load_total_user_status("zhejiang");
+    //load_total_user_status("jiangsu");
+  });
+
+  function load_total_user_status(name){
+    get_total_user_status_of_a_province(name);
+    gif_template = "<img src='/images/admin-ajax-loader.gif' />";
+    $("#total_user tr[name="+ name +"] td.data").html(gif_template);
+  }
+
+  function load_daily_user_status(name){
+    get_daily_user_status_of_a_province(name);
+    gif_template = "<img src='/images/admin-ajax-loader.gif' />";
+    $("#daily_user tr[name="+ name +"] td.data").html(gif_template);
+  }
+
+  function load_crawler_progress(){
+    get_crawler_progress();
+    gif_template = "<img src='/images/admin-ajax-loader.gif' />";
+    $("#crawler-progress tbody").html(gif_template);
+  }
+
+
+  function load_web_cook_status(name){
+    get_web_cook_status_of_a_province(name);
+    gif_template = "<img src='/images/admin-ajax-loader.gif' />";
+    $("#web_cooks tr[name="+ name +"] td.data").html(gif_template);
+  }
+
+  function load_disk_status(){
+    url = "/status/get_disk_status.json";
+    $("#disk > p").html(gif_template);
+    $.get(url,
+      {},
+      function(result){
+        $("#disk > p").text('');
+        for (index in result.content.split('\n'))
+        {
+          $("#disk > p").append("<p>"+result.content.split('\n')[index]+"</p>");
+        };
+      },
+      "json")    
+  }
+
+  function load_cpu_status(){
+      url = "/status/get_cpu_status.json";
+      $("#cpu > p").html(gif_template);
+      $.get(url,
+        {},
+        function(result){
+          $("#cpu > p").text('');
+          for (index in result.content.split('\n'))
+          {
+            $("#cpu > p").append("<p>"+result.content.split('\n')[index]+"</p>");
+          };
+        },
+        "json")
+  }
+
+  function load_rake_status(){
+    url = "/status/get_rake_status.json";
+    $("#rake > p").html(gif_template);
+    $.get(url,
+      {},
+      function(result){
+        $("#rake > p").text('');
+        for (index in result.content.split('\n'))
+        {
+          $("#rake > p").append("<p>"+result.content.split('\n')[index]+"</p>");
+        };
+      },
+      "json")
+  }
+
+  function load_mobile_cook_status(name){
+    get_mobile_cook_status_of_a_province(name);
+    gif_template = "<img src='/images/admin-ajax-loader.gif' />";
+    $("#mobile_cooks tr[name="+ name +"] td.data").html(gif_template);
+  }
+
+  function load_timeline_crawler_status(){
+    get_timeline_crawler_status();
+    gif_template = "<img src='/images/admin-ajax-loader.gif' />";
+    $("#timeline-crawler tbody").html(gif_template);
+  }
+
+  function load_repost_robot_status(){
+    get_repost_robot_status();
+    gif_template = "<img src='/images/admin-ajax-loader.gif' />";
+    $("#repost-robot tbody").html(gif_template);
+  }
+
+  function get_repost_robot_status(){
+    url = "/status/get_repost_robot_status.json";
+    $.get(url,
+      {},
+      function(result){
+        $("#repost-robot tbody").html('');
+        for (index in result)
+        {
+          $("#repost-robot tbody").append(
+            "<tr>" +
+            "<td>" + (parseInt(index)+1) +"</td>" +
+            "<td>" + result[index].username +"</td>" +
+            "<td>" + (result[index].status==-1? "异常" : "正常") +"</td>" +
+            "<td>" + (result[index].last_repost_time==null? "无" : result[index].last_repost_time) +"</td>" +
+            "</tr>"
+          );
+        };
+      },
+      "json")    
+  }
+
+  function get_crawler_progress(){
+    url = "/status/get_crawler_progress.json";
+    $.get(url,
+      {},
+      function(result){
+        //console.log(result)
+        $("#crawler-progress tbody").html('');
+        for (index in result)
+        {
+          //console.log(result[index]);
+          if (result[index]){
+            $("#crawler-progress tbody").append(
+              "<tr>" +
+              "<td>" + index +"</td>" +
+              "<td>" + result[index] +"</td>" +
+              "</tr>"
+            );
+          }
+        };
+      },
+    "json")         
+  }
+
+  function get_timeline_crawler_status(){
+    url = "/status/get_timeline_crawler_status.json";
+    $.get(url,
+      {},
+      function(result){
+        $("#timeline-crawler tbody").html('');
+        for (index in result)
+        {
+          $("#timeline-crawler tbody").append(
+            "<tr>" +
+            "<td>" + (parseInt(index)+1) +"</td>" +
+            "<td>" + result[index].uid +"</td>" +
+            "<td>" + result[index].screen_name +"</td>" +
+            "<td>" + result[index].weibo_count +"</td>" +
+            "<td>" + result[index].last_weibo_create_time +"</td>" +
+            "</tr>"
+          );
+        };
+      },
+      "json")    
+  }
+
+  function get_total_user_status_of_a_province(name){
+    url = "/status/get_total_user_status_of_a_province.json?province=" + name;
+    $.get(url,
+      {},
+      function(result){
+        $("#total_user tr[name="+ name +"] td[name=user_count]").text(result.all_user_count);
+        $("#total_user tr[name="+ name +"] td[name=zero_contact_count]").text(result.zero_contact_count);
+        $("#total_user tr[name="+ name +"] td[name=empty_mobile_count]").text(result.empty_mobile_count);
+      },
+      "json")
+  }
+
+  function get_daily_user_status_of_a_province(name){
+    url = "/status/get_daily_user_status_of_a_province.json?province=" + name;
+    $.get(url,
+      {},
+      function(result){
+        $("#daily_user tr[name="+ name +"] td[name=today]").text(result.new_user_of_today);
+        $("#daily_user tr[name="+ name +"] td[name=yesterday]").text(result.new_user_of_yesterday);
+        $("#daily_user tr[name="+ name +"] td[name=2days_ago]").text(result.new_user_of_2_day_ago);
+        $("#daily_user tr[name="+ name +"] td[name=3days_ago]").text(result.new_user_of_3_day_ago);
+        $("#daily_user tr[name="+ name +"] td[name=4days_ago]").text(result.new_user_of_4_day_ago);
+        $("#daily_user tr[name="+ name +"] td[name=5days_ago]").text(result.new_user_of_5_day_ago);
+        $("#daily_user tr[name="+ name +"] td[name=6days_ago]").text(result.new_user_of_6_day_ago);
+      },
+      "json")
+  }
+
+  function get_web_cook_status_of_a_province(name){
+    url = "/status/get_web_cook_status_of_a_province.json?province=" + name;
+    $.get(url,
+      {},
+      function(result){
+        $("#web_cooks tr[name="+ name +"] td[name=cook_count]").text(result.cook_count);
+        $("#web_cooks tr[name="+ name +"] td[name=owner_count]").text(result.owner_count);
+        $("#web_cooks tr[name="+ name +"] td[name=valid_count]").text(result.valid_count);
+        $("#web_cooks tr[name="+ name +"] td[name=expired_count]").text(result.expired_count);
+        $("#web_cooks tr[name="+ name +"] td[name=0_to_5]").text(result.cook_update_betweent_0_to_5_hour);
+        $("#web_cooks tr[name="+ name +"] td[name=5_to_10]").text(result.cook_update_betweent_5_to_10_hour);
+        $("#web_cooks tr[name="+ name +"] td[name=10_to_15]").text(result.cook_update_betweent_10_to_15_hour);
+        $("#web_cooks tr[name="+ name +"] td[name=15_to_20]").text(result.cook_update_betweent_15_to_20_hour);
+        $("#web_cooks tr[name="+ name +"] td[name=20_to_24]").text(result.cook_update_betweent_20_to_24_hour);
+        $("#web_cooks tr[name="+ name +"] td[name=before_24]").text(result.cook_update_before_24_hour);
+        $("#web_cooks tr[name="+ name +"] td[name=die_today]").text(result.cook_die_today);
+        $("#web_cooks tr[name="+ name +"] td[name=die_yesterday]").text(result.cook_die_yesterday);
+        $("#web_cooks tr[name="+ name +"] td[name=die_2dayago]").text(result.cook_die_2dayago);
+        $("#web_cooks tr[name="+ name +"] td[name=die_3dayago]").text(result.cook_die_3dayago);
+        $("#web_cooks tr[name="+ name +"] td[name=die_4dayago]").text(result.cook_die_4dayago);
+        $("#web_cooks tr[name="+ name +"] td[name=die_5dayago]").text(result.cook_die_5dayago);
+        $("#web_cooks tr[name="+ name +"] td[name=die_6dayago]").text(result.cook_die_6dayago);
+      },
+  "json")
+  }
+
+  function get_mobile_cook_status_of_a_province(name){
+    url = "/status/get_mobile_cook_status_of_a_province.json?province=" + name;
+    $.get(url,
+      {},
+      function(result){
+        $("#mobile_cooks tr[name="+ name +"] td[name=cook_count]").text(result.cook_count);
+        $("#mobile_cooks tr[name="+ name +"] td[name=owner_count]").text(result.owner_count);
+        $("#mobile_cooks tr[name="+ name +"] td[name=valid_count]").text(result.valid_count);
+        $("#mobile_cooks tr[name="+ name +"] td[name=forbidden_count]").text(result.forbidden_count);
+        $("#mobile_cooks tr[name="+ name +"] td[name=new_count]").text(result.new_count);
+      },
+  "json")
+  }
+
+</script>
+
+<h3>统计信息 >> 用户总数</h3>
+<i class="icon-star" onclick="$('#monitor-total-user').toggle();"></i>
+<div id="monitor-total-user" style="display:none;">
+<table class="table table-bordered" id="total_user">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="3" style="text-align:center;">用户总数</th>
+      <th></th>
+    </tr>
+    <tr>
+      <th>Server</th>
+      <th>user总数</th>
+      <th>contact全零总数数</th>
+      <th>name为空总数</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% ["guangdong", "shanghai", "zhejiang", "jiangsu"].each do |province| %>
+    <tr name="<%= province %>">
+      <td>#<%= province %></td>
+      <td name="user_count" class="data"></td>
+      <td name="zero_contact_count" class="data"></td>
+      <td name="empty_mobile_count" class="data"></td>
+      <td><a onclick='load_total_user_status("<%= province %>");'>刷新</a></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+<hr />
+
+<h3>统计信息 >> 每日新增</h3>
+<i class="icon-star" onclick="$('#monitor-daily-user').toggle();"></i>
+<div id="monitor-daily-user" style="display:none;">
+<table class="table table-bordered" id="daily_user">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="7" style="text-align:center;">每日新增用户数量</th>
+      <th></th>
+    </tr>
+    <tr>
+      <th>省份</th>
+      <th>今日新增</th>
+      <th>昨日新增</th>
+      <th>2天前新增</th>
+      <th>3天前新增</th>
+      <th>4天前新增</th>
+      <th>5天前新增</th>
+      <th>6天前新增</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% ["guangdong", "shanghai", "zhejiang", "jiangsu"].each do |province| %>
+    <tr name="<%= province %>">
+      <td>#<%= province %></td>
+      <td name="today" class="data"></td>
+      <td name="yesterday" class="data"></td>
+      <td name="2days_ago" class="data"></td>
+      <td name="3days_ago" class="data"></td>
+      <td name="4days_ago" class="data"></td>
+      <td name="5days_ago" class="data"></td>
+      <td name="6days_ago" class="data"></td>
+      <td><a onclick='load_daily_user_status("<%= province %>");'>刷新</a></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+<hr />
+
+<h3>监控 >> 爬虫进度</h3>
+<i class="icon-star" onclick="$('#monitor-crawler-progress').toggle();"></i>
+<div id="monitor-crawler-progress" style="display:none;">
+<div>
+  <table class="table table-bordered" id="crawler-progress">
+    <thead>
+      <tr>
+        <th>爬虫ID</th>
+        <th>当前UID</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</div>
+<div><button class='btn' onclick='load_crawler_progress();'>获取爬虫进度</button></div>
+</div>
+<hr />
+
+
+<h3>统计信息 >> Web版帐号信息</h3>
+<i class="icon-star" onclick="$('#monitor-web-cooks').toggle();"></i>
+<div id="monitor-web-cooks" style="display:none;">
+<table class="table table-bordered" id="web_cooks">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="4" style="text-align:center;">cookie数量</th>
+      <th colspan="6" style="text-align:center;">更新时间统计</th>
+      <th colspan="7" style="text-align:center;">被封时间统计</th>
+      <th></th>
+    </tr>
+    <tr>
+      <th>省份</th>
+      <th>总数</th>
+      <th>组数</th>
+      <th>有效</th>
+      <th>过期</th>
+      <th>0-5h前</th>
+      <th>5-10h前</th>
+      <th>10-15h前</th>
+      <th>15-20h前</th>
+      <th>20-24h前</th>
+      <th>24h前</th>
+      <th>今日</th>
+      <th>昨日</th>
+      <th>2天前</th>
+      <th>3天前</th>
+      <th>4天前</th>
+      <th>5天前</th>
+      <th>6天前</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% ["contact", "guangdong", "shanghai", "zhejiang", "jiangsu"].each do |province| %>
+    <tr name="<%= province %>">
+      <td>#<%= province %></td>
+      <td name="cook_count" class="data"></td>
+      <td name="owner_count" class="data"></td>
+      <td name="valid_count" class="data"></td>
+      <td name="expired_count" class="data"></td>
+      <td name="0_to_5" class="data"></td>
+      <td name="5_to_10" class="data"></td>
+      <td name="10_to_15" class="data"></td>
+      <td name="15_to_20" class="data"></td>
+      <td name="20_to_24" class="data"></td>
+      <td name="before_24" class="data"></td>
+      <td name="die_today" class="data"></td>
+      <td name="die_yesterday" class="data"></td>
+      <td name="die_2dayago" class="data"></td>
+      <td name="die_3dayago" class="data"></td>
+      <td name="die_4dayago" class="data"></td>
+      <td name="die_5dayago" class="data"></td>
+      <td name="die_6dayago" class="data"></td>
+      <td><a onclick='load_web_cook_status("<%= province %>");'>刷新</a></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+<hr />
+
+<h3>统计信息 >> Mobile版帐号信息</h3>
+<i class="icon-star" onclick="$('#monitor-mobile-cooks').toggle();"></i>
+<div id="monitor-mobile-cooks" style="display:none;">
+<table class="table table-bordered" id="mobile_cooks">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="5" style="text-align:center;">cookie数量</th>
+      <th></th>
+    </tr>
+    <tr>
+      <th>省份</th>
+      <th>总数</th>
+      <th>组数</th>
+      <th>有效</th>
+      <th>被封</th>
+      <th>未更新</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% ["guangdong", "shanghai", "zhejiang", "jiangsu"].each do |province| %>
+    <tr name="<%= province %>">
+      <td>#<%= province %></td>
+      <td name="cook_count" class="data"></td>
+      <td name="owner_count" class="data"></td>
+      <td name="valid_count" class="data"></td>
+      <td name="forbidden_count" class="data"></td>
+      <td name="new_count" class="data"></td>
+      <td><a onclick='load_mobile_cook_status("<%= province %>");'>刷新</a></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+<hr />
+
+<h3>统计信息 >> 磁盘状态</h2>
+<i class="icon-star" onclick="$('#monitor-disk').toggle();"></i>
+<div id="monitor-disk" style="display:none;">
+  <div class="well" id="disk"><p></p></div>
+  <div><button class='btn' onclick='load_disk_status();'>获取磁盘状态</button></div>
+</div>
+<hr />
+
+<h3>统计信息 >> CPU状态</h2>
+<i class="icon-star" onclick="$('#monitor-cpu').toggle();"></i>
+<div id="monitor-cpu" style="display:none;">
+  <div class="well" id="cpu"><p></p></div>
+  <div><button class='btn' onclick='load_cpu_status();'>获取CPU状态</button></div>
+</div>
+<hr />
+
+
+<h3>统计信息 >> 任务状态</h2>
+<i class="icon-star" onclick="$('#monitor-total-crawler').toggle();"></i>
+<div id="monitor-total-crawler" style="display:none;">
+  <div class="well" id="rake"><p></p></div>
+  <div><button class='btn' onclick='load_rake_status();'>获取任务状态</button></div>
+</div>
+<hr />
+
+<h3>监控 >> Timeline爬虫</h2>
+<i class="icon-star" onclick="$('#monitor-timeline-crawler').toggle();"></i>
+<div id="monitor-timeline-crawler" style="display:none;">
+<div>
+  <table class="table table-bordered" id="timeline-crawler">
+    <thead>
+      <tr>
+        <th>序号</th>
+        <th>UID</th>
+        <th>昵称</th>
+        <th>已爬取的微博数量</th>
+        <th>已爬取的最后一条微博的发布时间</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</div>
+<div><button class='btn' onclick='load_timeline_crawler_status();'>获取Timeline爬虫状态</button></div>
+</div>
+<hr />
+
+<h3>监控 >> 定时转发</h2>
+<i class="icon-star" onclick="$('#monitor-repost-robot').toggle();"></i>
+<div id="monitor-repost-robot" style="display:none;">
+<div>
+  <table class="table table-bordered" id="repost-robot">
+    <thead>
+      <tr>
+        <th>序号</th>
+        <th>用户名</th>
+        <th>状态</th>
+        <th>转发最后一条微博的时间</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</div>
+<div><button class='btn' onclick='load_repost_robot_status();'>获取Timeline爬虫状态</button></div>
+</div>
+<hr />

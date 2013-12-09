@@ -1,0 +1,245 @@
+<style type="text/css" media="screen">
+
+  table {
+    font-size: 10px
+  }
+
+  label.checkbox {
+    display: -moz-inline-stack;  
+    display: inline-block;       
+    zoom: 1;                     
+    *display: inline;
+  }
+  div.loading_more {
+    text-align: center;
+    display: none;
+  }
+  div.loading_more img{
+    width: 36px;
+  }
+</style>
+<%= javascript_include_tag "knockout/knockout.js", "knockout/knockout.map.js","utils.js" %>
+
+<div class="row-fluid" >
+  <div class="span3">
+   <ul class="nav  nav-pills nav-stacked" style="margin-top:40px;">
+        <li class="">
+          <a href="/search">微博搜人</a> 
+        </li>
+        <li class="">
+          <a href="/follow">关注工具</a> 
+        </li>
+        <li class="">
+          <a href="/interactive">实时互动</a> 
+        </li>
+        <li class="">
+          <a href="/lbs">LBS工具</a> 
+        </li>
+        <li class="">
+          <a href="/repost/setting">定时转发</a> 
+        </li>
+        <li class="">
+          <a href="/push">精准推送</a> 
+        </li>
+        <li class="active">
+          <a href="#">竞品分析</a> 
+        </li>
+    </ul>
+  </div>
+  <div class="span9">
+    <ul id="tabs" class="nav nav-tabs">
+        <li class="active">
+          <a data-bind="click: $root.switchToAccountComp">账户互动用户分析</a>
+        </li>
+        <li>
+          <a data-bind="click: $root.switchToWeiboComp">微博互动用户分析</a>
+        </li>
+    </ul>
+    <div class="row-fluid">
+      <div class="span8">
+        账号昵称：<input type="text" placeholder="" data-bind="value: account"><br>
+        <label class="checkbox">
+         <input type="checkbox" name="comment"  value="1" checked="checked" data-bind="click: checkboxClicked">参与评论用户
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="repost"  value="2" data-bind="click: checkboxClicked">参与转发用户
+        </label>
+        <label class="checkbox">
+           <input type="checkbox" name="original"  value="3" data-bind="click: checkboxClicked">只抓取原创微博
+        </label>
+      </div>
+      <div class="span4">
+        <button class="btn btn-primary" data-bind="click: fetch">开始</button>
+      </div>
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th style="width:80px;">ID</th>
+            <th style="width:100px;">昵称</th>
+            <th style="width:80px;">地域</th>
+            <th style="width:30px;">性别</th>
+            <th style="width:30px;">加V</th>
+            <th style="width:30px;">互动指数</th>
+            <th>互动历史</th>
+          </tr>
+        </thead>
+        <tbody data-bind="foreach: users">
+          <tr>
+            <td data-bind="text: id"></td>
+            <td data-bind="text: screen_name"></td>
+            <td data-bind="text: location"></td>
+            <td data-bind="text: gender"></td>
+            <td data-bind="text: verified"></td>
+            <td data-bind="text: histories().length"></td>
+            <td data-bind="foreach: histories()">
+              <span data-bind="text: $index()+1"></span>.
+              <span data-bind="text: text"></span>
+              (<span data-bind="text: source"></span>)
+              <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="loading_more">
+        <img src ="/images/ajax_load.gif"/> 
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  var tagMap = {
+    account: 0,
+    weibo: 1
+  };
+  $(function() {
+    function fetch_ajax_by_account() {
+      var self = this;
+      self.param = {
+        name: '',
+        original: false,
+        comment: true,
+        repost: false,
+      };
+      self.callback = function(){};
+      self.timer = null;
+
+      self.init = function(param, callback) {
+        self.param = $.extend(self.param, param);
+        self.callback = callback;
+
+        $('.loading_more').show();
+        self.start_generate_data();
+        // self.get_cache_data();
+        self.timer = setInterval(self.get_cache_data, 5000);
+      };
+
+      self.start_generate_data = function() {
+        $.ajax({
+          url: '/competitor/interactive_users_of_one_account.json', 
+          data: self.param,
+          success: function(data) {
+            if(!data || data.status !== 1)  {
+              self.clearTimer();
+            } 
+          },
+          error: function() {
+            self.clearTimer();
+          }
+        });
+      };
+
+      self.get_cache_data = function() {
+        $.ajax({
+          url: '/competitor/rt_interactive_users_of_one_account.json', 
+          data: self.param,
+          success: function(data) {
+            //if(data != null)  {
+              var percent = data.percent;
+              var users = data.users;
+              if(parseInt(percent) === 1) {
+                self.clearTimer();
+              } 
+              if (users.length > 0 && percent > 0)
+                self.callback(users);
+            //} else {
+            //  self.clearTimer();
+            //  return;              
+            //}
+          },
+          error: function() {
+            self.clearTimer();
+          }
+        });
+      };
+
+      self.clearTimer = function() {
+        $('.loading_more').hide();
+        self.timer && clearInterval(self.timer);
+      };
+    };
+
+    var viewmodel = function() {
+      var self = this;
+      self.target = ko.observable(tagMap.account);
+      self.search_type = ko.observable('');
+      self.users = ko.observableArray([]);
+
+      self.account = ko.observable('');
+      self.original = ko.observable(false);
+      self.comment = ko.observable(true);
+      self.repost = ko.observable(false);
+
+      self.switchToAccountComp = function(data, event) {
+        var el = $(event.target || event.srcElement);
+        $(el).tab('show');
+        self.target(tagMap.account);
+      };
+
+      self.switchToWeiboComp = function(data, event) {
+        var el = $(event.target || event.srcElement);
+        $(el).tab('show');
+        self.target(tagMap.weibo);
+      };
+
+      self.checkboxClicked = function(data, event) {
+        var el = $(event.target || event.srcElement);
+        var name = $(el).attr('name');
+        var checked = $(el).attr('checked');
+        self[name](!!checked);
+
+        return true;
+      }
+
+      self.fetch = function() {
+        if (self.target() === tagMap.account) {
+          if (self.account().trim().length == 0) {
+            alert('please input a weibo name..');
+            return;
+          }
+
+          self.users.removeAll();
+
+          var account_ajax = new fetch_ajax_by_account();
+          var param = {
+            name: self.account(),
+            original: self.original(),
+            comment: self.comment(),
+            repost: self.repost()
+          }
+
+          account_ajax.init(param, function(users) {
+            self.users.removeAll();
+            $.each(users, function(index, item) {
+              var model = ko.mapping.fromJS(item);
+              self.users.push(model);
+            });
+          });
+        }
+      };
+    };
+
+    var model = new viewmodel();
+    ko.applyBindings(model);
+  });
+</script>

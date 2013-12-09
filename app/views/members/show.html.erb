@@ -1,0 +1,40 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Name:</b>
+  <%= @member.name %>
+</p>
+
+<p>
+  <b>Hashed password:</b>
+  <%= @member.hashed_password %>
+</p>
+
+<p>
+  <b>Salt:</b>
+  <%= @member.salt %>
+</p>
+
+<p>
+  <b>Role:</b>
+  <%= @member.role %>
+</p>
+
+<p>
+  <b>At permission:</b>
+  <%= @member.at_permission %>
+</p>
+
+<p>
+  <b>Follow permission:</b>
+  <%= @member.follow_permission %>
+</p>
+
+<p>
+  <b>Platform permission:</b>
+  <%= @member.platform_permission %>
+</p>
+
+
+<%= link_to 'Edit', edit_member_path(@member) %> |
+<%= link_to 'Back', members_path %>

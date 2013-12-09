@@ -1,0 +1,46 @@
+<h1>会员列表</h1>
+
+<%= link_to '新建', new_member_path %>
+
+<table class="table">
+  <tr>
+    <th style="width:30px;">#</th>
+    <th style="width:80px;">用户名</th>
+    <th style="width:200px;">微博昵称</th>
+    <th style="width:80px;">角色</th>
+    <th style="width:120px;">注册时间</th>
+    <th>数据导出</th>
+    <th>批量关注</th>
+    <th>实时互动</th>
+    <th>LBS</th>
+    <th>定时转发</th>
+    <th>批量推送</th>
+    <th style="width:60px;">机器绑定</th>
+    <th style="width:40px;"></th>
+    <th style="width:40px;"></th>
+    <th style="width:40px;"></th>
+  </tr>
+
+<% @members.each_with_index do |member,index| %>
+  <tr>
+    <td><%= index+1 %></td>
+    <td><%= member.name %></td>
+    <td><a href="http://weibo.com/<%= member.uid %>/info" target="_blank"><%= member.weibo_name %></a></td>
+    <td><%= member.role %></td>
+    <td><%= member.created_at.strftime("%Y-%m-%d") %></td>
+    <td><%= bool_to_switch(member.export_permission) %></td>
+    <td><%= bool_to_switch(member.follow_permission) %></td>
+    <td><%= bool_to_switch(member.comm_permission) %></td>
+    <td><%= bool_to_switch(member.lbs_permission) %></td>
+    <td><%= bool_to_switch(member.repost_permission) %></td>    
+    <td><%= bool_to_switch(member.at_permission) %></td>
+    <td><%= member.machine_codes.count %>/<%= member.bind_limit %></td>    
+    <td><%= link_to "详细", member %></td>
+    <td><%= link_to "修改权限", edit_member_path(member) %></td>
+    <td><%= link_to "删除", :controller => "members", :action => "delete", :id => member %>
+  </tr>
+<% end %>
+</table>
+
+<br />
+

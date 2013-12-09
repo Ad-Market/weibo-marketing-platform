@@ -1,0 +1,6 @@
+修改MAC工具，避免被封,mac可从mac_lists文件中任选，该工具在电信楼415实验室测试通过。
+
+命令格式：sudo change_mac any_mac_address
+
+比如：sudo change_mac 00:0c:18:ef:ff:11
+
